@@ -24,6 +24,7 @@ import { PreviewPanel } from "./PreviewEditor";
 import { Terminal } from "./Terminal";
 import { EditorSidebar } from "./EditorSidebar";
 import { ModeToggle } from "../shared/ThemeToggle";
+import { ProjectsManager } from "../projects/ProjectsManager";
 
 const models = [
   { id: "gpt-4", name: "GPT-4", provider: "OpenAI", color: "bg-primary" },
@@ -89,6 +90,8 @@ function App() {
     switch (activePanel) {
       case "editor":
         return <MonacoEditor value={code} onChange={setCode} language={language} />;
+      case "projects":
+        return <ProjectsManager />;
       case "templates":
         return <TemplateSelector onTemplateSelect={handleTemplateSelect} />;
       case "preview":
