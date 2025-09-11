@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Toaster } from "sonner";
+import { Provider } from "react-redux";
+import { store } from "@/redux/store";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,8 +38,10 @@ export default function RootLayout({
           disableTransitionOnChange
           storageKey='myNotionKey'
         >
-          {children}
-          <Toaster />
+          <Provider store={store}>
+            {children}
+            <Toaster />
+          </Provider>
         </ThemeProvider>
       </body>
     </html>
