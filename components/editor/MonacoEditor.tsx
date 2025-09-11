@@ -1,5 +1,7 @@
-import { useRef, useEffect } from "react";
-import Editor from "@monaco-editor/react";
+"use client";
+
+import { useRef } from "react";
+import Editor, { OnMount } from "@monaco-editor/react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,8 +10,6 @@ import {
   Copy, 
   Download, 
   RotateCcw,
-  Maximize2,
-  Settings
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -23,32 +23,32 @@ interface MonacoEditorProps {
 export function MonacoEditor({ value, onChange, language, theme = "vs-dark" }: MonacoEditorProps) {
   const editorRef = useRef<any>(null);
 
-  const handleEditorDidMount = (editor: any) => {
+  const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
-    
-    // Custom theme configuration
-    editor.defineTheme('vibeCoding', {
-      base: 'vs-dark',
+
+    // ✅ defineTheme na monaco.editor, nie na editor
+    monaco.editor.defineTheme("vibeCoding", {
+      base: "vs-dark",
       inherit: true,
       rules: [
-        { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
-        { token: 'keyword', foreground: 'C586C0' },
-        { token: 'string', foreground: 'CE9178' },
-        { token: 'number', foreground: 'B5CEA8' },
-        { token: 'function', foreground: 'DCDCAA' },
-        { token: 'variable', foreground: '9CDCFE' },
+        { token: "comment", foreground: "6A9955", fontStyle: "italic" },
+        { token: "keyword", foreground: "C586C0" },
+        { token: "string", foreground: "CE9178" },
+        { token: "number", foreground: "B5CEA8" },
+        { token: "function", foreground: "DCDCAA" },
+        { token: "variable", foreground: "9CDCFE" },
       ],
       colors: {
-        'editor.background': '#0F0F0F',
-        'editor.foreground': '#FFFFFF',
-        'editorLineNumber.foreground': '#6A5ACD',
-        'editorCursor.foreground': '#00FFFF',
-        'editor.selectionBackground': '#6A5ACD40',
-        'editor.lineHighlightBackground': '#1A1A1A',
-      }
+        "editor.background": "#0F0F0F",
+        "editor.foreground": "#FFFFFF",
+        "editorLineNumber.foreground": "#6A5ACD",
+        "editorCursor.foreground": "#00FFFF",
+        "editor.selectionBackground": "#6A5ACD40",
+        "editor.lineHighlightBackground": "#1A1A1A",
+      },
     });
-    
-    editor.setTheme('vibeCoding');
+
+    monaco.editor.setTheme("vibeCoding");
   };
 
   const handleRunCode = () => {
@@ -62,9 +62,9 @@ export function MonacoEditor({ value, onChange, language, theme = "vs-dark" }: M
 
   const handleDownload = () => {
     const fileExtension = getFileExtension(language);
-    const blob = new Blob([value], { type: 'text/plain' });
+    const blob = new Blob([value], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = `code.${fileExtension}`;
     document.body.appendChild(a);
@@ -76,28 +76,28 @@ export function MonacoEditor({ value, onChange, language, theme = "vs-dark" }: M
 
   const handleFormat = () => {
     if (editorRef.current) {
-      editorRef.current.trigger('source', 'editor.action.formatDocument');
+      editorRef.current.trigger("source", "editor.action.formatDocument");
       toast.success("Code formatted!");
     }
   };
 
   const getFileExtension = (lang: string) => {
     const extensions: { [key: string]: string } = {
-      javascript: 'js',
-      typescript: 'ts',
-      python: 'py',
-      java: 'java',
-      cpp: 'cpp',
-      html: 'html',
-      css: 'css',
-      json: 'json',
-      markdown: 'md',
-      sql: 'sql',
-      php: 'php',
-      go: 'go',
-      rust: 'rs',
+      javascript: "js",
+      typescript: "ts",
+      python: "py",
+      java: "java",
+      cpp: "cpp",
+      html: "html",
+      css: "css",
+      json: "json",
+      markdown: "md",
+      sql: "sql",
+      php: "php",
+      go: "go",
+      rust: "rs",
     };
-    return extensions[lang] || 'txt';
+    return extensions[lang] || "txt";
   };
 
   return (
@@ -113,7 +113,7 @@ export function MonacoEditor({ value, onChange, language, theme = "vs-dark" }: M
             {language}
           </Badge>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <Button variant="ghost" size="sm" onClick={handleCopyCode}>
             <Copy className="w-4 h-4" />
@@ -130,7 +130,7 @@ export function MonacoEditor({ value, onChange, language, theme = "vs-dark" }: M
           </Button>
         </div>
       </div>
-      
+
       <div className="h-[calc(100%-73px)]">
         <Editor
           value={value}
@@ -141,21 +141,21 @@ export function MonacoEditor({ value, onChange, language, theme = "vs-dark" }: M
           options={{
             minimap: { enabled: true },
             fontSize: 14,
-            lineNumbers: 'on',
+            lineNumbers: "on",
             roundedSelection: false,
             scrollBeyondLastLine: false,
             automaticLayout: true,
             tabSize: 2,
-            wordWrap: 'on',
+            wordWrap: "on",
             bracketPairColorization: { enabled: true },
-            cursorBlinking: 'smooth',
-            cursorSmoothCaretAnimation: 'on',
+            cursorBlinking: "smooth",
+            cursorSmoothCaretAnimation: "on",
             smoothScrolling: true,
             contextmenu: true,
             mouseWheelZoom: true,
             quickSuggestions: true,
             suggestOnTriggerCharacters: true,
-            acceptSuggestionOnEnter: 'on',
+            acceptSuggestionOnEnter: "on",
           }}
         />
       </div>
