@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Play, Copy, Download, RotateCcw } from "lucide-react";
+import { Play, Copy, Download, RotateCcw, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface MonacoEditorProps {
@@ -181,13 +181,14 @@ export function MonacoEditor({ value, onChange, language = "javascript", theme =
           theme="vibeCoding"
           onChange={handleEditorChange}
           onMount={handleEditorDidMount}
+          loading={<Loader2 className="animate-spin w-8 h-8" />}
           options={{
             minimap: { enabled: true },
             fontSize: 14,
             lineNumbers: "on",
             scrollBeyondLastLine: false,
             automaticLayout: true,
-            tabSize: 2,
+            tabSize: 4,
             wordWrap: "on",
             bracketPairColorization: { enabled: true },
           }}

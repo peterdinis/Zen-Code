@@ -19,10 +19,10 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { MonacoEditor } from "./MonacoEditor";
-import { TemplateSelector } from "./TemplateSelection";
 import { PreviewPanel } from "./PreviewEditor";
 import { Terminal } from "./Terminal";
 import { EditorSidebar } from "./EditorSidebar";
+import TemplateSection from "./TemplateSelection";
 
 const models = [
   { id: "gpt-4", name: "GPT-4", provider: "OpenAI", color: "bg-primary" },
@@ -89,7 +89,7 @@ function App() {
       case "editor":
         return <MonacoEditor value={code} onChange={setCode} language={language} />;
       case "templates":
-        return <TemplateSelector onTemplateSelect={handleTemplateSelect} />;
+        return <TemplateSection onTemplateSelect={handleTemplateSelect} />;
       case "preview":
         return <PreviewPanel code={code} language={language} />;
       case "terminal":

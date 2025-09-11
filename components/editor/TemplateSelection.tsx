@@ -1,334 +1,442 @@
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
-  FileText,
-  Download,
-  Globe,
-  Database,
-  Smartphone,
-  Server,
-} from "lucide-react";
-import { toast } from "sonner";
+import React, { useState, useEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
+import Head from 'next/head';
 
-const templates = [
-  {
-    category: "Web Frontend",
-    icon: Globe,
-    color: "bg-primary/20 text-primary",
-    templates: [
-      {
-        name: "React App",
-        language: "javascript",
-        description: "Basic React component with hooks",
-        code: `import React, { useState } from 'react';
-
-function App() {
-  const [count, setCount] = useState(0);
-
-  return (
-    <div className="app">
-      <h1>Hello React!</h1>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>
-        Increment
-      </button>
-    </div>
-  );
+// Define template types
+interface Template {
+  id: string;
+  name: string;
+  description: string;
+  language: string;
+  code: string;
+  category: string;
 }
 
-export default App;`
+// Define props interface
+interface TemplateSectionProps {
+  onTemplateSelect: (templateCode: string, templateLanguage: string) => void;
+}
+
+// Dynamically import Monaco Editor to avoid SSR issues
+const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-full bg-gray-900">
+      <div className="text-white">Loading editor...</div>
+    </div>
+  )
+});
+
+const TemplateSection: React.FC<TemplateSectionProps> = ({ onTemplateSelect }) => {
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [filteredTemplates, setFilteredTemplates] = useState<Template[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [categories, setCategories] = useState<string[]>([]);
+  const editorRef = useRef<any>(null);
+
+  // Initialize templates
+  useEffect(() => {
+    const initialTemplates: Template[] = [
+      {
+        id: 'react-component',
+        name: 'React Component',
+        description: 'Basic React component with TypeScript',
+        language: 'typescript',
+        code: `import React from 'react';
+
+interface Props {
+  name: string;
+}
+
+const MyComponent: React.FC<Props> = ({ name }) => {
+  return (
+    <div className="p-4 bg-blue-100 rounded-lg">
+      <h1>Hello, {name}!</h1>
+      <p>This is a React component with TypeScript.</p>
+    </div>
+  );
+};
+
+export default MyComponent;`,
+        category: 'Web Frontend'
       },
       {
-        name: "Vue Component", 
-        language: "javascript",
-        description: "Vue 3 composition API component",
+        id: 'vue-component',
+        name: 'Vue Component',
+        description: 'Vue composition API component',
+        language: 'javascript',
         code: `<template>
-  <div class="vue-app">
-    <h1>{{ title }}</h1>
-    <p>Count: {{ count }}</p>
-    <button @click="increment">Increment</button>
+  <div class="greeting">
+    <h1>{{ greeting }}</h1>
+    <button @click="changeGreeting">Change Greeting</button>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const title = ref('Hello Vue!')
-const count = ref(0)
+const greeting = ref('Hello, Vue!');
 
-const increment = () => {
-  count.value++
-}
+const changeGreeting = () => {
+  greeting.value = greeting.value === 'Hello, Vue!' 
+    ? 'Hi from Vue!' 
+    : 'Hello, Vue!';
+};
 </script>
 
 <style scoped>
-.vue-app {
-  padding: 20px;
+.greeting {
+  padding: 1rem;
+  text-align: center;
 }
-</style>`
-      }
-    ]
-  },
-  {
-    category: "Backend",
-    icon: Server,
-    color: "bg-accent/20 text-accent",
-    templates: [
+</style>`,
+        category: 'Web Frontend'
+      },
       {
-        name: "Express API",
-        language: "javascript", 
-        description: "Node.js Express server",
-        code: `const express = require('express');
-const cors = require('cors');
+        id: 'express-api',
+        name: 'Express API',
+        description: 'Node.js Express server with TypeScript',
+        language: 'typescript',
+        code: `import express, { Application, Request, Response } from 'express';
+import dotenv from 'dotenv';
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+dotenv.config();
+
+const app: Application = express();
+const port = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
 app.use(express.json());
 
 // Routes
-app.get('/api/hello', (req, res) => {
-  res.json({ message: 'Hello World!' });
+app.get('/', (req: Request, res: Response) => {
+  res.json({ message: 'Hello from Express API!' });
 });
 
-app.get('/api/users/:id', (req, res) => {
-  const { id } = req.params;
-  res.json({ id, name: \`User \${id}\` });
+app.get('/api/users', (req: Request, res: Response) => {
+  const users = [
+    { id: 1, name: 'John Doe' },
+    { id: 2, name: 'Jane Smith' }
+  ];
+  res.json(users);
 });
 
-app.listen(PORT, () => {
-  console.log(\`Server running on port \${PORT}\`);
-});`
+// Start server
+app.listen(port, () => {
+  console.log(\`Server is running on port \${port}\`);
+});`,
+        category: 'Backend'
       },
       {
-        name: "FastAPI Python",
-        language: "python",
-        description: "Python FastAPI server", 
+        id: 'fastapi-python',
+        name: 'FastAPI Python',
+        description: 'Python FastAPI server',
+        language: 'python',
         code: `from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional
 
 app = FastAPI()
 
-class User(BaseModel):
-    id: int
+class Item(BaseModel):
     name: str
-    email: Optional[str] = None
-
-users_db = []
+    description: Optional[str] = None
+    price: float
+    tax: Optional[float] = None
 
 @app.get("/")
-async def root():
-    return {"message": "Hello FastAPI!"}
+async def read_root():
+    return {"message": "Hello from FastAPI"}
 
-@app.post("/users/", response_model=User)
-async def create_user(user: User):
-    users_db.append(user)
-    return user
+@app.get("/items/{item_id}")
+async def read_item(item_id: int, q: Optional[str] = None):
+    return {"item_id": item_id, "q": q}
 
-@app.get("/users/", response_model=List[User])
-async def get_users():
-    return users_db
+@app.post("/items/")
+async def create_item(item: Item):
+    return item
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)`
-      }
-    ]
-  },
-  {
-    category: "Mobile",
-    icon: Smartphone,
-    color: "bg-electric-blue/20 text-electric-blue", 
-    templates: [
+@app.put("/items/{item_id}")
+async def update_item(item_id: int, item: Item):
+    return {"item_id": item_id, **item.dict()}`,
+        category: 'Backend'
+      },
       {
-        name: "React Native",
-        language: "javascript",
-        description: "React Native mobile app",
+        id: 'react-native',
+        name: 'React Native',
+        description: 'React Native mobile app component',
+        language: 'javascript',
         code: `import React, { useState } from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 const App = () => {
   const [count, setCount] = useState(0);
 
+  const increment = () => {
+    setCount(count + 1);
+  };
+
+  const decrement = () => {
+    setCount(count - 1);
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <View style={styles.body}>
-          <Text style={styles.title}>Hello React Native!</Text>
-          <Text style={styles.counter}>Count: {count}</Text>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => setCount(count + 1)}
-          >
-            <Text style={styles.buttonText}>Increment</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <View style={styles.container}>
+      <Text style={styles.title}>React Native Counter</Text>
+      <Text style={styles.count}>{count}</Text>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={decrement}>
+          <Text style={styles.buttonText}>-</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={increment}>
+          <Text style={styles.buttonText}>+</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  body: {
-    padding: 24,
+    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#f5f5f5',
   },
   title: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: 'bold',
     marginBottom: 20,
   },
-  counter: {
-    fontSize: 18,
-    marginBottom: 20,
+  count: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    marginBottom: 40,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
   },
   button: {
     backgroundColor: '#007AFF',
-    padding: 12,
-    borderRadius: 8,
+    padding: 15,
+    borderRadius: 10,
+    marginHorizontal: 10,
+    minWidth: 60,
+    alignItems: 'center',
   },
   buttonText: {
     color: 'white',
-    fontWeight: '600',
+    fontSize: 24,
+    fontWeight: 'bold',
   },
 });
 
-export default App;`
-      }
-    ]
-  },
-  {
-    category: "Data Science",
-    icon: Database,
-    color: "bg-neon-pink/20 text-neon-pink",
-    templates: [
+export default App;`,
+        category: 'Mobile'
+      },
       {
-        name: "Data Analysis",
-        language: "python",
-        description: "Pandas data analysis starter",
-        code: `import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+        id: 'sql-query',
+        name: 'SQL Query',
+        description: 'Create and query database tables',
+        language: 'sql',
+        code: `-- Create users table
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-# Load and explore data
-def load_data(file_path):
-    """Load dataset and perform initial exploration"""
-    df = pd.read_csv(file_path)
-    
-    print("Dataset Info:")
-    print(f"Shape: {df.shape}")
-    print(f"Columns: {df.columns.tolist()}")
-    print("\\nData Types:")
-    print(df.dtypes)
-    print("\\nMissing Values:")
-    print(df.isnull().sum())
-    
-    return df
+-- Create posts table
+CREATE TABLE posts (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    content TEXT,
+    published BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
 
-# Basic statistics
-def analyze_data(df):
-    """Perform basic statistical analysis"""
-    print("\\nDescriptive Statistics:")
-    print(df.describe())
-    
-    # Correlation matrix
-    plt.figure(figsize=(10, 8))
-    correlation_matrix = df.corr()
-    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
-    plt.title('Correlation Matrix')
-    plt.show()
-    
-    return correlation_matrix
+-- Insert sample data
+INSERT INTO users (username, email) VALUES
+('johndoe', 'john@example.com'),
+('janedoe', 'jane@example.com');
 
-# Example usage
-if __name__ == "__main__":
-    # Replace with your dataset path
-    # df = load_data('your_dataset.csv')
-    # analyze_data(df)
-    
-    # Sample data for demo
-    np.random.seed(42)
-    sample_data = pd.DataFrame({
-        'feature1': np.random.normal(0, 1, 100),
-        'feature2': np.random.normal(2, 1.5, 100),
-        'target': np.random.randint(0, 2, 100)
-    })
-    
-    print("Sample Analysis:")
-    analyze_data(sample_data)`
+INSERT INTO posts (user_id, title, content, published) VALUES
+(1, 'First Post', 'This is my first post!', TRUE),
+(1, 'Draft Post', 'This is a draft post.', FALSE),
+(2, 'Jane''s Post', 'Hello from Jane!', TRUE);
+
+-- Query to get all published posts with author info
+SELECT 
+    p.title, 
+    p.content, 
+    p.created_at, 
+    u.username as author
+FROM posts p
+JOIN users u ON p.user_id = u.id
+WHERE p.published = TRUE
+ORDER BY p.created_at DESC;`,
+        category: 'Database'
       }
-    ]
-  }
-];
+    ];
 
-interface TemplateSelectorProps {
-  onTemplateSelect: (code: string, language: string) => void;
-}
+    setTemplates(initialTemplates);
+    setFilteredTemplates(initialTemplates);
+    
+    // Extract unique categories
+    const uniqueCategories = ['all', ...new Set(initialTemplates.map(t => t.category))];
+    setCategories(uniqueCategories as string[]);
+    
+    // Set the first template as selected by default
+    if (initialTemplates.length > 0 && !selectedTemplate) {
+      setSelectedTemplate(initialTemplates[0]);
+    }
+  }, []);
 
-export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps) {
-  const handleTemplateClick = (template: any) => {
+  // Handle template selection
+  const handleSelectTemplate = (template: Template) => {
+    setSelectedTemplate(template);
+    // Call the parent callback function
     onTemplateSelect(template.code, template.language);
-    toast.success(`${template.name} template loaded!`);
+  };
+
+  // Handle category filter
+  const handleCategoryFilter = (category: string) => {
+    setSelectedCategory(category);
+    if (category === 'all') {
+      setFilteredTemplates(templates);
+    } else {
+      setFilteredTemplates(templates.filter(t => t.category === category));
+    }
+  };
+
+  // Handle editor mounting
+  const handleEditorDidMount = (editor: any) => {
+    editorRef.current = editor;
   };
 
   return (
-    <div className="space-y-6">
-      {templates.map((category) => (
-        <Card key={category.category} className="glass p-6">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${category.color}`}>
-              <category.icon className="w-5 h-5" />
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+      <Head>
+        <title>Template Section with Monaco Editor</title>
+        <meta name="description" content="Template selection with Monaco editor" />
+      </Head>
+
+      <div className="container mx-auto px-4 py-8">
+        <header className="mb-8 text-center">
+          <h1 className="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+            Code Templates
+          </h1>
+          <p className="text-gray-400">Select a template to view and edit in the Monaco editor</p>
+        </header>
+
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Template sidebar */}
+          <div className="w-full lg:w-1/3 bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+            <div className="p-4 bg-gray-700">
+              <h2 className="text-xl font-semibold">Templates</h2>
             </div>
-            <h3 className="text-lg font-semibold">{category.category}</h3>
-          </div>
-          
-          <div className="grid gap-4">
-            {category.templates.map((template, index) => (
-              <Card key={index} className="p-4 border border-border/50 hover:border-primary/50 transition-colors cursor-pointer">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <FileText className="w-4 h-4 text-primary" />
-                      <h4 className="font-medium">{template.name}</h4>
-                      <Badge variant="outline" className="text-xs">
-                        {template.language}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {template.description}
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleTemplateClick(template)}
-                    className="shrink-0 ml-3"
+            
+            {/* Category filter */}
+            <div className="p-4 bg-gray-750">
+              <div className="flex flex-wrap gap-2">
+                {categories.map(category => (
+                  <button
+                    key={category}
+                    onClick={() => handleCategoryFilter(category)}
+                    className={`px-3 py-1 rounded-full text-sm ${
+                      selectedCategory === category
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}
                   >
-                    <Download className="w-4 h-4" />
-                  </Button>
+                    {category}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Template list */}
+            <div className="overflow-y-auto max-h-96">
+              {filteredTemplates.map(template => (
+                <div
+                  key={template.id}
+                  onClick={() => handleSelectTemplate(template)}
+                  className={`p-4 border-b border-gray-700 cursor-pointer transition-colors ${
+                    selectedTemplate?.id === template.id
+                      ? 'bg-blue-900 bg-opacity-30'
+                      : 'hover:bg-gray-700'
+                  }`}
+                >
+                  <h3 className="font-medium text-lg">{template.name}</h3>
+                  <p className="text-gray-400 text-sm mt-1">{template.description}</p>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-xs text-gray-500">{template.category}</span>
+                    <span className="text-xs px-2 py-1 bg-gray-700 rounded">
+                      {template.language}
+                    </span>
+                  </div>
                 </div>
-              </Card>
-            ))}
+              ))}
+            </div>
           </div>
-        </Card>
-      ))}
+
+          {/* Editor section */}
+          <div className="w-full lg:w-2/3 bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+            <div className="p-4 bg-gray-700 flex justify-between items-center">
+              <h2 className="text-xl font-semibold">
+                {selectedTemplate?.name || 'Select a template'}
+              </h2>
+              <div className="text-sm text-gray-400">
+                {selectedTemplate?.language.toUpperCase()}
+              </div>
+            </div>
+            
+            <div className="h-96 md:h-[500px]">
+              {selectedTemplate ? (
+                <MonacoEditor
+                  height="100%"
+                  language={selectedTemplate.language}
+                  value={selectedTemplate.code}
+                  theme="vs-dark"
+                  onMount={handleEditorDidMount}
+                  options={{
+                    minimap: { enabled: false },
+                    scrollBeyondLastLine: false,
+                    fontSize: 14,
+                    wordWrap: 'on',
+                    automaticLayout: true,
+                    padding: { top: 10 }
+                  }}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full bg-gray-900">
+                  <p className="text-gray-500">Select a template to start editing</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="p-4 bg-gray-750 flex justify-between items-center">
+              <div className="text-sm text-gray-400">
+                {selectedTemplate?.category} • {selectedTemplate?.language}
+              </div>
+              <div className="flex space-x-2">
+                <button className="px-4 py-2 bg-gray-700 rounded text-sm hover:bg-gray-600 transition-colors">
+                  Copy Code
+                </button>
+                <button className="px-4 py-2 bg-blue-600 rounded text-sm hover:bg-blue-500 transition-colors">
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default TemplateSection;
