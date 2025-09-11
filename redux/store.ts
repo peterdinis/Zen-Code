@@ -1,5 +1,5 @@
-import { configureStore } from '@reduxjs/toolkit';
-import templateReducer from "./slices/templateSlices"
+import { configureStore } from "@reduxjs/toolkit";
+import templateReducer from "./slices/templateSlices";
 
 export const store = configureStore({
   reducer: {

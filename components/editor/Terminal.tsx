@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Terminal as TerminalIcon, 
-  Play, 
-  Trash2, 
+import {
+  Terminal as TerminalIcon,
+  Play,
+  Trash2,
   Download,
   Package,
-  Settings
+  Settings,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -20,7 +20,7 @@ interface Command {
   input: string;
   output: string;
   timestamp: Date;
-  status: 'success' | 'error' | 'running';
+  status: "success" | "error" | "running";
 }
 
 interface PackageInfo {
@@ -37,60 +37,209 @@ interface TemplatePackages {
 // Template-specific packages
 const templatePackages: TemplatePackages = {
   // React Templates
-  'react-component': [
-    { name: "react", description: "JavaScript library for building user interfaces", category: "core" },
-    { name: "react-dom", description: "React package for working with the DOM", category: "core" },
-    { name: "@types/react", description: "TypeScript definitions for React", category: "types", devDependency: true },
-    { name: "@types/react-dom", description: "TypeScript definitions for React DOM", category: "types", devDependency: true },
-    { name: "react-router-dom", description: "Declarative routing for React", category: "routing" },
-    { name: "axios", description: "HTTP client for the browser and node.js", category: "http" },
+  "react-component": [
+    {
+      name: "react",
+      description: "JavaScript library for building user interfaces",
+      category: "core",
+    },
+    {
+      name: "react-dom",
+      description: "React package for working with the DOM",
+      category: "core",
+    },
+    {
+      name: "@types/react",
+      description: "TypeScript definitions for React",
+      category: "types",
+      devDependency: true,
+    },
+    {
+      name: "@types/react-dom",
+      description: "TypeScript definitions for React DOM",
+      category: "types",
+      devDependency: true,
+    },
+    {
+      name: "react-router-dom",
+      description: "Declarative routing for React",
+      category: "routing",
+    },
+    {
+      name: "axios",
+      description: "HTTP client for the browser and node.js",
+      category: "http",
+    },
   ],
-  'react-hooks': [
-    { name: "react", description: "JavaScript library for building user interfaces", category: "core" },
-    { name: "react-dom", description: "React package for working with the DOM", category: "core" },
-    { name: "@types/react", description: "TypeScript definitions for React", category: "types", devDependency: true },
-    { name: "@types/react-dom", description: "TypeScript definitions for React DOM", category: "types", devDependency: true },
-    { name: "react-query", description: "Hooks for fetching, caching and updating asynchronous data", category: "data" },
-    { name: "react-hook-form", description: "Performant, flexible forms with easy-to-use validation", category: "forms" },
+  "react-hooks": [
+    {
+      name: "react",
+      description: "JavaScript library for building user interfaces",
+      category: "core",
+    },
+    {
+      name: "react-dom",
+      description: "React package for working with the DOM",
+      category: "core",
+    },
+    {
+      name: "@types/react",
+      description: "TypeScript definitions for React",
+      category: "types",
+      devDependency: true,
+    },
+    {
+      name: "@types/react-dom",
+      description: "TypeScript definitions for React DOM",
+      category: "types",
+      devDependency: true,
+    },
+    {
+      name: "react-query",
+      description: "Hooks for fetching, caching and updating asynchronous data",
+      category: "data",
+    },
+    {
+      name: "react-hook-form",
+      description: "Performant, flexible forms with easy-to-use validation",
+      category: "forms",
+    },
   ],
 
   // Vue Templates
-  'vue-composition': [
-    { name: "vue", description: "The Progressive JavaScript Framework", category: "core" },
-    { name: "@vitejs/plugin-vue", description: "Vite plugin for Vue", category: "build", devDependency: true },
-    { name: "vue-router", description: "Official router for Vue.js", category: "routing" },
-    { name: "pinia", description: "Intuitive, type safe store for Vue", category: "state" },
-    { name: "vueuse", description: "Collection of essential Vue Composition Utilities", category: "utilities" },
+  "vue-composition": [
+    {
+      name: "vue",
+      description: "The Progressive JavaScript Framework",
+      category: "core",
+    },
+    {
+      name: "@vitejs/plugin-vue",
+      description: "Vite plugin for Vue",
+      category: "build",
+      devDependency: true,
+    },
+    {
+      name: "vue-router",
+      description: "Official router for Vue.js",
+      category: "routing",
+    },
+    {
+      name: "pinia",
+      description: "Intuitive, type safe store for Vue",
+      category: "state",
+    },
+    {
+      name: "vueuse",
+      description: "Collection of essential Vue Composition Utilities",
+      category: "utilities",
+    },
   ],
 
   // Backend Templates
-  'express-api': [
-    { name: "express", description: "Fast, unopinionated, minimalist web framework", category: "core" },
-    { name: "@types/express", description: "TypeScript definitions for Express", category: "types", devDependency: true },
-    { name: "cors", description: "Express middleware to enable CORS", category: "middleware" },
-    { name: "helmet", description: "Help secure Express apps with various HTTP headers", category: "security" },
-    { name: "mongoose", description: "MongoDB object modeling for Node.js", category: "database" },
-    { name: "jsonwebtoken", description: "JSON Web Token implementation", category: "auth" },
+  "express-api": [
+    {
+      name: "express",
+      description: "Fast, unopinionated, minimalist web framework",
+      category: "core",
+    },
+    {
+      name: "@types/express",
+      description: "TypeScript definitions for Express",
+      category: "types",
+      devDependency: true,
+    },
+    {
+      name: "cors",
+      description: "Express middleware to enable CORS",
+      category: "middleware",
+    },
+    {
+      name: "helmet",
+      description: "Help secure Express apps with various HTTP headers",
+      category: "security",
+    },
+    {
+      name: "mongoose",
+      description: "MongoDB object modeling for Node.js",
+      category: "database",
+    },
+    {
+      name: "jsonwebtoken",
+      description: "JSON Web Token implementation",
+      category: "auth",
+    },
   ],
 
-  'fastapi-crud': [
-    { name: "fastapi", description: "Modern, fast web framework for building APIs", category: "core" },
-    { name: "uvicorn", description: "Lightning-fast ASGI server", category: "server", devDependency: true },
-    { name: "pydantic", description: "Data validation using Python type hints", category: "validation" },
-    { name: "sqlalchemy", description: "Database Toolkit for Python", category: "database" },
-    { name: "alembic", description: "Database migration tool for SQLAlchemy", category: "database", devDependency: true },
-    { name: "python-jose", description: "JOSE implementation in Python", category: "auth" },
+  "fastapi-crud": [
+    {
+      name: "fastapi",
+      description: "Modern, fast web framework for building APIs",
+      category: "core",
+    },
+    {
+      name: "uvicorn",
+      description: "Lightning-fast ASGI server",
+      category: "server",
+      devDependency: true,
+    },
+    {
+      name: "pydantic",
+      description: "Data validation using Python type hints",
+      category: "validation",
+    },
+    {
+      name: "sqlalchemy",
+      description: "Database Toolkit for Python",
+      category: "database",
+    },
+    {
+      name: "alembic",
+      description: "Database migration tool for SQLAlchemy",
+      category: "database",
+      devDependency: true,
+    },
+    {
+      name: "python-jose",
+      description: "JOSE implementation in Python",
+      category: "auth",
+    },
   ],
 
   // Default packages (shown when no template is selected)
-  'default': [
-    { name: "react", description: "JavaScript library for building user interfaces", category: "frontend" },
-    { name: "vue", description: "The Progressive JavaScript Framework", category: "frontend" },
-    { name: "express", description: "Fast, unopinionated, minimalist web framework", category: "backend" },
-    { name: "typescript", description: "Typed superset of JavaScript", category: "language", devDependency: true },
-    { name: "lodash", description: "Utility library for JavaScript", category: "utilities" },
-    { name: "axios", description: "HTTP client for the browser and node.js", category: "http" },
-  ]
+  default: [
+    {
+      name: "react",
+      description: "JavaScript library for building user interfaces",
+      category: "frontend",
+    },
+    {
+      name: "vue",
+      description: "The Progressive JavaScript Framework",
+      category: "frontend",
+    },
+    {
+      name: "express",
+      description: "Fast, unopinionated, minimalist web framework",
+      category: "backend",
+    },
+    {
+      name: "typescript",
+      description: "Typed superset of JavaScript",
+      category: "language",
+      devDependency: true,
+    },
+    {
+      name: "lodash",
+      description: "Utility library for JavaScript",
+      category: "utilities",
+    },
+    {
+      name: "axios",
+      description: "HTTP client for the browser and node.js",
+      category: "http",
+    },
+  ],
 };
 
 const commonCommands = [
@@ -107,20 +256,25 @@ interface TerminalProps {
   onPackageInstall?: (packageName: string, isDev?: boolean) => void;
 }
 
-export function Terminal({ selectedTemplate, onPackageInstall }: TerminalProps) {
+export function Terminal({
+  selectedTemplate,
+  onPackageInstall,
+}: TerminalProps) {
   const [currentInput, setCurrentInput] = useState("");
   const [commands, setCommands] = useState<Command[]>([
     {
       id: "1",
       input: "Welcome to VibeCoding Terminal!",
-      output: selectedTemplate 
+      output: selectedTemplate
         ? `Template selected: ${selectedTemplate}\nType commands below or install packages for your template.`
         : "Select a template to see relevant packages. Type commands below or click on common commands.",
       timestamp: new Date(),
-      status: 'success'
-    }
+      status: "success",
+    },
   ]);
-  const [activeTab, setActiveTab] = useState<'terminal' | 'packages'>('terminal');
+  const [activeTab, setActiveTab] = useState<"terminal" | "packages">(
+    "terminal",
+  );
   const terminalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -136,9 +290,9 @@ export function Terminal({ selectedTemplate, onPackageInstall }: TerminalProps) 
         input: `template selected: ${selectedTemplate}`,
         output: `Template "${selectedTemplate}" loaded. You can now install packages specific to this template.`,
         timestamp: new Date(),
-        status: 'success'
+        status: "success",
       };
-      setCommands(prev => [...prev, welcomeCommand]);
+      setCommands((prev) => [...prev, welcomeCommand]);
     }
   }, [selectedTemplate]);
 
@@ -148,37 +302,37 @@ export function Terminal({ selectedTemplate, onPackageInstall }: TerminalProps) 
       input,
       output: "",
       timestamp: new Date(),
-      status: 'running'
+      status: "running",
     };
 
-    setCommands(prev => [...prev, newCommand]);
+    setCommands((prev) => [...prev, newCommand]);
 
     // Simulate command execution
     setTimeout(() => {
       let output = "";
-      let status: 'success' | 'error' = 'success';
+      let status: "success" | "error" = "success";
 
-      if (input.startsWith('npm install')) {
-        const packageName = input.replace('npm install', '').trim();
-        output = `📦 Installing ${packageName || 'packages'}...\n✅ Package installed successfully!`;
-        
+      if (input.startsWith("npm install")) {
+        const packageName = input.replace("npm install", "").trim();
+        output = `📦 Installing ${packageName || "packages"}...\n✅ Package installed successfully!`;
+
         if (packageName && onPackageInstall) {
-          const isDev = input.includes('--save-dev') || input.includes('-D');
+          const isDev = input.includes("--save-dev") || input.includes("-D");
           onPackageInstall(packageName, isDev);
         }
-        
+
         toast.success("Package installed!");
-      } else if (input.startsWith('npm run')) {
-        const script = input.replace('npm run', '').trim();
-        output = `🚀 Running ${script || 'script'}...\n✅ Script executed successfully!`;
+      } else if (input.startsWith("npm run")) {
+        const script = input.replace("npm run", "").trim();
+        output = `🚀 Running ${script || "script"}...\n✅ Script executed successfully!`;
         toast.success("Script executed!");
-      } else if (input.startsWith('git')) {
+      } else if (input.startsWith("git")) {
         output = `🌿 Git command executed\n✅ Repository updated!`;
         toast.success("Git command executed!");
-      } else if (input === 'clear') {
+      } else if (input === "clear") {
         setCommands([]);
         return;
-      } else if (input === 'help') {
+      } else if (input === "help") {
         output = `Available commands:
 📦 npm install [package]  : Install npm package
 🔧 npm run [script]       : Run npm script
@@ -186,29 +340,31 @@ export function Terminal({ selectedTemplate, onPackageInstall }: TerminalProps) 
 🧹 clear                  : Clear terminal
 ❓ help                   : Show this help
 📋 template-info          : Show current template information`;
-      } else if (input === 'template-info') {
+      } else if (input === "template-info") {
         if (selectedTemplate) {
-          const packages = templatePackages[selectedTemplate] || templatePackages['default'];
-          output = `📋 Template: ${selectedTemplate}\n📦 Available packages:\n${
-            packages.map(pkg => `  • ${pkg.name}${pkg.devDependency ? ' (dev)' : ''} - ${pkg.description}`).join('\n')
-          }`;
+          const packages =
+            templatePackages[selectedTemplate] || templatePackages["default"];
+          output = `📋 Template: ${selectedTemplate}\n📦 Available packages:\n${packages
+            .map(
+              (pkg) =>
+                `  • ${pkg.name}${pkg.devDependency ? " (dev)" : ""} - ${pkg.description}`,
+            )
+            .join("\n")}`;
         } else {
           output = "No template selected. Please select a template first.";
-          status = 'error';
+          status = "error";
         }
-      } else if (input.trim() === '') {
+      } else if (input.trim() === "") {
         return;
       } else {
         output = `❌ Command '${input}' not found. Type 'help' for available commands.`;
-        status = 'error';
+        status = "error";
       }
 
-      setCommands(prev =>
-        prev.map(cmd =>
-          cmd.id === newCommand.id
-            ? { ...cmd, output, status }
-            : cmd
-        )
+      setCommands((prev) =>
+        prev.map((cmd) =>
+          cmd.id === newCommand.id ? { ...cmd, output, status } : cmd,
+        ),
       );
     }, 1000);
 
@@ -216,13 +372,13 @@ export function Terminal({ selectedTemplate, onPackageInstall }: TerminalProps) 
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       executeCommand(currentInput);
     }
   };
 
   const installPackage = (packageName: string, isDev: boolean = false) => {
-    const command = `npm install ${packageName}${isDev ? ' --save-dev' : ''}`;
+    const command = `npm install ${packageName}${isDev ? " --save-dev" : ""}`;
     executeCommand(command);
   };
 
@@ -235,20 +391,20 @@ export function Terminal({ selectedTemplate, onPackageInstall }: TerminalProps) 
     if (selectedTemplate && templatePackages[selectedTemplate]) {
       return templatePackages[selectedTemplate];
     }
-    return templatePackages['default'];
+    return templatePackages["default"];
   };
 
   const getPackageCategories = () => {
     const packages = getCurrentPackages();
     const categories: { [key: string]: PackageInfo[] } = {};
-    
-    packages.forEach(pkg => {
+
+    packages.forEach((pkg) => {
       if (!categories[pkg.category]) {
         categories[pkg.category] = [];
       }
       categories[pkg.category].push(pkg);
     });
-    
+
     return categories;
   };
 
@@ -257,18 +413,18 @@ export function Terminal({ selectedTemplate, onPackageInstall }: TerminalProps) 
       {/* Tabs */}
       <div className="flex space-x-2">
         <Button
-          variant={activeTab === 'terminal' ? 'default' : 'ghost'}
+          variant={activeTab === "terminal" ? "default" : "ghost"}
           size="sm"
-          onClick={() => setActiveTab('terminal')}
+          onClick={() => setActiveTab("terminal")}
           className="flex items-center space-x-2"
         >
           <TerminalIcon className="w-4 h-4" />
           <span>Terminal</span>
         </Button>
         <Button
-          variant={activeTab === 'packages' ? 'default' : 'ghost'}
+          variant={activeTab === "packages" ? "default" : "ghost"}
           size="sm"
-          onClick={() => setActiveTab('packages')}
+          onClick={() => setActiveTab("packages")}
           className="flex items-center space-x-2"
         >
           <Package className="w-4 h-4" />
@@ -281,7 +437,7 @@ export function Terminal({ selectedTemplate, onPackageInstall }: TerminalProps) 
         </Button>
       </div>
 
-      {activeTab === 'terminal' ? (
+      {activeTab === "terminal" ? (
         <Card className="glass">
           {/* Terminal Header */}
           <div className="p-4 border-b border-border flex items-center justify-between">
@@ -293,7 +449,7 @@ export function Terminal({ selectedTemplate, onPackageInstall }: TerminalProps) 
               </div>
               <Badge variant="secondary" className="bg-primary/20 text-primary">
                 <TerminalIcon className="w-3 h-3 mr-1" />
-                {selectedTemplate || 'bash'}
+                {selectedTemplate || "bash"}
               </Badge>
               {selectedTemplate && (
                 <Badge variant="outline" className="text-xs">
@@ -307,7 +463,7 @@ export function Terminal({ selectedTemplate, onPackageInstall }: TerminalProps) 
           </div>
 
           {/* Terminal Output */}
-          <div 
+          <div
             ref={terminalRef}
             className="h-64 p-4 font-mono text-sm bg-background/50 overflow-y-auto"
           >
@@ -316,14 +472,18 @@ export function Terminal({ selectedTemplate, onPackageInstall }: TerminalProps) 
                 <div className="flex items-center space-x-2 text-accent">
                   <span>$</span>
                   <span>{command.input}</span>
-                  {command.status === 'running' && (
+                  {command.status === "running" && (
                     <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
                   )}
                 </div>
                 {command.output && (
-                  <pre className={`mt-1 whitespace-pre-wrap ${
-                    command.status === 'error' ? 'text-destructive' : 'text-muted-foreground'
-                  }`}>
+                  <pre
+                    className={`mt-1 whitespace-pre-wrap ${
+                      command.status === "error"
+                        ? "text-destructive"
+                        : "text-muted-foreground"
+                    }`}
+                  >
                     {command.output}
                   </pre>
                 )}
@@ -342,7 +502,7 @@ export function Terminal({ selectedTemplate, onPackageInstall }: TerminalProps) 
                 placeholder="Type a command..."
                 className="font-mono bg-transparent border-0 focus:ring-1 focus:ring-primary"
               />
-              <Button 
+              <Button
                 size="sm"
                 onClick={() => executeCommand(currentInput)}
                 disabled={!currentInput.trim()}
@@ -354,7 +514,9 @@ export function Terminal({ selectedTemplate, onPackageInstall }: TerminalProps) 
 
           {/* Common Commands */}
           <div className="p-4 border-t border-border">
-            <h4 className="text-sm font-medium mb-3 text-muted-foreground">Common Commands:</h4>
+            <h4 className="text-sm font-medium mb-3 text-muted-foreground">
+              Common Commands:
+            </h4>
             <div className="grid grid-cols-2 gap-2">
               {commonCommands.map((cmd) => (
                 <Button
@@ -377,7 +539,9 @@ export function Terminal({ selectedTemplate, onPackageInstall }: TerminalProps) 
             <h3 className="font-semibold flex items-center space-x-2">
               <Package className="w-5 h-5 text-primary" />
               <span>
-                {selectedTemplate ? `${selectedTemplate} Packages` : "Popular Packages"}
+                {selectedTemplate
+                  ? `${selectedTemplate} Packages`
+                  : "Popular Packages"}
               </span>
             </h3>
             {selectedTemplate && (
@@ -391,44 +555,52 @@ export function Terminal({ selectedTemplate, onPackageInstall }: TerminalProps) 
             <div className="text-center py-8 text-muted-foreground">
               <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
               <p>Select a template to see relevant packages</p>
-              <p className="text-sm mt-1">Choose a template from the sidebar to get started</p>
+              <p className="text-sm mt-1">
+                Choose a template from the sidebar to get started
+              </p>
             </div>
           ) : (
             <div className="space-y-4">
-              {Object.entries(getPackageCategories()).map(([category, packages]) => (
-                <div key={category}>
-                  <h4 className="text-sm font-medium mb-2 text-muted-foreground capitalize">
-                    {category}
-                  </h4>
-                  <div className="grid gap-2">
-                    {packages.map((pkg) => (
-                      <div
-                        key={pkg.name}
-                        className="flex items-center justify-between p-3 border border-border/50 rounded-lg hover:border-primary/50 transition-colors"
-                      >
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2">
-                            <h4 className="font-medium">{pkg.name}</h4>
-                            {pkg.devDependency && (
-                              <Badge variant="outline" className="text-xs">
-                                dev
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-sm text-muted-foreground">{pkg.description}</p>
-                        </div>
-                        <Button
-                          size="sm"
-                          onClick={() => installPackage(pkg.name, pkg.devDependency)}
+              {Object.entries(getPackageCategories()).map(
+                ([category, packages]) => (
+                  <div key={category}>
+                    <h4 className="text-sm font-medium mb-2 text-muted-foreground capitalize">
+                      {category}
+                    </h4>
+                    <div className="grid gap-2">
+                      {packages.map((pkg) => (
+                        <div
+                          key={pkg.name}
+                          className="flex items-center justify-between p-3 border border-border/50 rounded-lg hover:border-primary/50 transition-colors"
                         >
-                          <Download className="w-4 h-4 mr-1" />
-                          Install
-                        </Button>
-                      </div>
-                    ))}
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2">
+                              <h4 className="font-medium">{pkg.name}</h4>
+                              {pkg.devDependency && (
+                                <Badge variant="outline" className="text-xs">
+                                  dev
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {pkg.description}
+                            </p>
+                          </div>
+                          <Button
+                            size="sm"
+                            onClick={() =>
+                              installPackage(pkg.name, pkg.devDependency)
+                            }
+                          >
+                            <Download className="w-4 h-4 mr-1" />
+                            Install
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ),
+              )}
             </div>
           )}
         </Card>

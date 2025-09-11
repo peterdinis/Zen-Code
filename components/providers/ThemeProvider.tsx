@@ -1,7 +1,10 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { ThemeProvider as NextThemesProvider, ThemeProviderProps } from 'next-themes';
+import * as React from "react";
+import {
+  ThemeProvider as NextThemesProvider,
+  ThemeProviderProps,
+} from "next-themes";
 
 // Custom hook to check if we're on the client
 function useIsClient() {

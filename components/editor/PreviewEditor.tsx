@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Eye, 
-  Smartphone, 
-  Monitor, 
-  RefreshCw, 
+import {
+  Eye,
+  Smartphone,
+  Monitor,
+  RefreshCw,
   ExternalLink,
   Code,
   Globe,
@@ -22,7 +22,9 @@ interface PreviewPanelProps {
 }
 
 export function PreviewPanel({ code, language }: PreviewPanelProps) {
-  const [previewMode, setPreviewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+  const [previewMode, setPreviewMode] = useState<
+    "desktop" | "tablet" | "mobile"
+  >("desktop");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = () => {
@@ -34,7 +36,7 @@ export function PreviewPanel({ code, language }: PreviewPanelProps) {
   };
 
   const getPreviewContent = () => {
-    if (language === 'html' || language === 'javascript') {
+    if (language === "html" || language === "javascript") {
       // For HTML/JS, create a live preview
       return (
         <iframe
@@ -63,7 +65,7 @@ export function PreviewPanel({ code, language }: PreviewPanelProps) {
             </head>
             <body>
               <div class="container">
-                ${language === 'html' ? code : `<div id="root"></div><script>${code}</script>`}
+                ${language === "html" ? code : `<div id="root"></div><script>${code}</script>`}
               </div>
             </body>
             </html>
@@ -92,9 +94,9 @@ export function PreviewPanel({ code, language }: PreviewPanelProps) {
   };
 
   const previewSizes = {
-    desktop: { width: '100%', height: '100%', icon: Monitor },
-    tablet: { width: '768px', height: '1024px', icon: Monitor },
-    mobile: { width: '375px', height: '667px', icon: Smartphone },
+    desktop: { width: "100%", height: "100%", icon: Monitor },
+    tablet: { width: "768px", height: "1024px", icon: Monitor },
+    mobile: { width: "375px", height: "667px", icon: Smartphone },
   };
 
   return (
@@ -108,7 +110,7 @@ export function PreviewPanel({ code, language }: PreviewPanelProps) {
             {language}
           </Badge>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           {/* Device Size Selector */}
           <div className="flex items-center space-x-1 bg-muted/50 rounded-lg p-1">
@@ -117,7 +119,7 @@ export function PreviewPanel({ code, language }: PreviewPanelProps) {
               return (
                 <Button
                   key={mode}
-                  variant={previewMode === mode ? 'default' : 'ghost'}
+                  variant={previewMode === mode ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setPreviewMode(mode as any)}
                   className="px-2"
@@ -127,16 +129,18 @@ export function PreviewPanel({ code, language }: PreviewPanelProps) {
               );
             })}
           </div>
-          
-          <Button 
-            variant="ghost" 
-            size="sm" 
+
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
+            />
           </Button>
-          
+
           <Button variant="ghost" size="sm">
             <ExternalLink className="w-4 h-4" />
           </Button>
@@ -156,23 +160,26 @@ export function PreviewPanel({ code, language }: PreviewPanelProps) {
               Responsive
             </TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="preview" className="h-[calc(100%-48px)]">
             <div className="h-full flex items-center justify-center">
-              <div 
+              <div
                 className="border border-border/50 rounded-lg overflow-hidden bg-white transition-all duration-300 shadow-lg"
                 style={{
                   width: previewSizes[previewMode].width,
-                  height: previewMode === 'desktop' ? '100%' : previewSizes[previewMode].height,
-                  maxWidth: '100%',
-                  maxHeight: '100%'
+                  height:
+                    previewMode === "desktop"
+                      ? "100%"
+                      : previewSizes[previewMode].height,
+                  maxWidth: "100%",
+                  maxHeight: "100%",
                 }}
               >
                 {getPreviewContent()}
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="responsive" className="h-[calc(100%-48px)]">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full">
               {Object.entries(previewSizes).map(([mode, config]) => {
@@ -181,17 +188,21 @@ export function PreviewPanel({ code, language }: PreviewPanelProps) {
                   <div key={mode} className="flex flex-col">
                     <div className="flex items-center space-x-2 mb-2">
                       <Icon className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-medium capitalize">{mode}</span>
+                      <span className="text-sm font-medium capitalize">
+                        {mode}
+                      </span>
                       <Badge variant="outline" className="text-xs">
-                        {mode === 'desktop' ? '100%' : `${config.width} × ${config.height}`}
+                        {mode === "desktop"
+                          ? "100%"
+                          : `${config.width} × ${config.height}`}
                       </Badge>
                     </div>
                     <div className="flex-1 border border-border/50 rounded-lg overflow-hidden bg-white">
-                      <div 
+                      <div
                         className="origin-top-left transform scale-50 w-[200%] h-[200%]"
-                        style={{ 
-                          width: mode === 'desktop' ? '100%' : config.width,
-                          height: mode === 'desktop' ? '100%' : config.height
+                        style={{
+                          width: mode === "desktop" ? "100%" : config.width,
+                          height: mode === "desktop" ? "100%" : config.height,
                         }}
                       >
                         {getPreviewContent()}
