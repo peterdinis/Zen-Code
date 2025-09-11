@@ -1,32 +1,68 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Editor, { OnMount } from "@monaco-editor/react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Play, 
-  Copy, 
-  Download, 
-  RotateCcw,
-} from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Play, Copy, Download, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
 interface MonacoEditorProps {
   value: string;
   onChange: (value: string) => void;
-  language: string;
+  language?: string;
   theme?: string;
 }
 
-export function MonacoEditor({ value, onChange, language, theme = "vs-dark" }: MonacoEditorProps) {
+const languageTemplates: { [key: string]: string } = {
+  javascript: `// JavaScript starter code
+console.log("Hello JavaScript!");`,
+  typescript: `// TypeScript starter code
+const greet = (name: string) => \`Hello, \${name}!\`;
+console.log(greet("TypeScript"));`,
+  python: `# Python starter code
+def greet(name):
+    return f"Hello, {name}!"
+
+print(greet("Python"))`,
+  java: `// Java starter code
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello Java!");
+    }
+}`,
+  cpp: `// C++ starter code
+#include <iostream>
+int main() {
+    std::cout << "Hello C++!" << std::endl;
+    return 0;
+}`,
+  html: `<!-- HTML starter code -->
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Hello HTML!</h1>
+</body>
+</html>`,
+  css: `/* CSS starter code */
+body {
+    background-color: #f0f0f0;
+    color: #333;
+}`,
+  json: `{
+  "message": "Hello JSON"
+}`,
+};
+
+export function MonacoEditor({ value, onChange, language = "javascript", theme = "vs-dark" }: MonacoEditorProps) {
   const editorRef = useRef<any>(null);
+  const [currentLanguage, setCurrentLanguage] = useState(language);
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
 
-    // ✅ defineTheme na monaco.editor, nie na editor
     monaco.editor.defineTheme("vibeCoding", {
       base: "vs-dark",
       inherit: true,
@@ -51,29 +87,21 @@ export function MonacoEditor({ value, onChange, language, theme = "vs-dark" }: M
     monaco.editor.setTheme("vibeCoding");
   };
 
-  const handleRunCode = () => {
-    toast.success("Code executed! ⚡");
-  };
-
+  const handleRunCode = () => toast.success("Code executed! ⚡");
   const handleCopyCode = async () => {
     await navigator.clipboard.writeText(value);
     toast.success("Code copied to clipboard!");
   };
-
   const handleDownload = () => {
-    const fileExtension = getFileExtension(language);
     const blob = new Blob([value], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url;
-    a.download = `code.${fileExtension}`;
+    a.href = URL.createObjectURL(blob);
+    a.download = `code.${currentLanguage}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
     toast.success("File downloaded!");
   };
-
   const handleFormat = () => {
     if (editorRef.current) {
       editorRef.current.trigger("source", "editor.action.formatDocument");
@@ -81,60 +109,51 @@ export function MonacoEditor({ value, onChange, language, theme = "vs-dark" }: M
     }
   };
 
-  const getFileExtension = (lang: string) => {
-    const extensions: { [key: string]: string } = {
-      javascript: "js",
-      typescript: "ts",
-      python: "py",
-      java: "java",
-      cpp: "cpp",
-      html: "html",
-      css: "css",
-      json: "json",
-      markdown: "md",
-      sql: "sql",
-      php: "php",
-      go: "go",
-      rust: "rs",
-    };
-    return extensions[lang] || "txt";
+  const handleLanguageChange = (lang: string) => {
+    setCurrentLanguage(lang);
+    onChange(languageTemplates[lang] || "");
   };
 
   return (
-    <Card className="h-full glass border-primary/20">
-      <div className="p-4 border-b border-border flex items-center justify-between">
+    <Card className="h-full glass border-primary/20 flex flex-col">
+      <div className="p-4 border-b border-border flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center space-x-3">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 rounded-full bg-destructive"></div>
             <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
             <div className="w-3 h-3 rounded-full bg-accent"></div>
           </div>
+
+          <Select value={currentLanguage} onValueChange={handleLanguageChange}>
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="Language" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.keys(languageTemplates).map((lang) => (
+                <SelectItem key={lang} value={lang}>
+                  {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           <Badge variant="secondary" className="bg-primary/20 text-primary">
-            {language}
+            {currentLanguage}
           </Badge>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="sm" onClick={handleCopyCode}>
-            <Copy className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={handleFormat}>
-            <RotateCcw className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={handleDownload}>
-            <Download className="w-4 h-4" />
-          </Button>
-          <Button size="sm" onClick={handleRunCode}>
-            <Play className="w-4 h-4" />
-            Run
-          </Button>
+        <div className="flex items-center space-x-2 flex-wrap">
+          <Button variant="ghost" size="sm" onClick={handleCopyCode}><Copy className="w-4 h-4" /></Button>
+          <Button variant="ghost" size="sm" onClick={handleFormat}><RotateCcw className="w-4 h-4" /></Button>
+          <Button variant="ghost" size="sm" onClick={handleDownload}><Download className="w-4 h-4" /></Button>
+          <Button size="sm" onClick={handleRunCode}><Play className="w-4 h-4 mr-1" />Run</Button>
         </div>
       </div>
 
-      <div className="h-[calc(100%-73px)]">
+      <div className="flex-1">
         <Editor
           value={value}
-          language={language}
+          language={currentLanguage}
           theme="vibeCoding"
           onChange={(newValue) => onChange(newValue || "")}
           onMount={handleEditorDidMount}
@@ -142,20 +161,11 @@ export function MonacoEditor({ value, onChange, language, theme = "vs-dark" }: M
             minimap: { enabled: true },
             fontSize: 14,
             lineNumbers: "on",
-            roundedSelection: false,
             scrollBeyondLastLine: false,
             automaticLayout: true,
             tabSize: 2,
             wordWrap: "on",
             bracketPairColorization: { enabled: true },
-            cursorBlinking: "smooth",
-            cursorSmoothCaretAnimation: "on",
-            smoothScrolling: true,
-            contextmenu: true,
-            mouseWheelZoom: true,
-            quickSuggestions: true,
-            suggestOnTriggerCharacters: true,
-            acceptSuggestionOnEnter: "on",
           }}
         />
       </div>
