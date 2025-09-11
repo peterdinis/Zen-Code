@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Play, Copy, Download, RotateCcw, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { languageTemplates } from "./languages/languagesTemplates";
+import { getFileExtension } from "./languages/languagesExensions";
 
 interface MonacoEditorProps {
   value: string;
@@ -15,29 +17,10 @@ interface MonacoEditorProps {
   language?: string;
   theme?: string;
 }
-
-// Šablóny pre viacero jazykov
-const languageTemplates: { [key: string]: string } = {
-  javascript: `console.log("Hello JavaScript!");`,
-  typescript: `const greet = (name: string) => \`Hello, \${name}!\`;\nconsole.log(greet("TypeScript"));`,
-  python: `def greet(name):\n    return f"Hello, {name}!"\n\nprint(greet("Python"))`,
-  java: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello Java!");\n    }\n}`,
-  cpp: `#include <iostream>\nint main() {\n    std::cout << "Hello C++!" << std::endl;\n    return 0;\n}`,
-  html: `<!DOCTYPE html>\n<html>\n<body>\n    <h1>Hello HTML!</h1>\n</body>\n</html>`,
-  css: `body {\n    background-color: #f0f0f0;\n    color: #333;\n}`,
-  json: `{\n  "message": "Hello JSON"\n}`,
-  php: `<?php\nfunction greet($name) {\n    return "Hello $name!";\n}\n\necho greet("PHP");\n?>`,
-  go: `package main\nimport "fmt"\nfunc main() {\n    fmt.Println("Hello Go!")\n}`,
-  rust: `fn main() {\n    println!("Hello Rust!");\n}`,
-  sql: `SELECT 'Hello SQL!' AS greeting;`,
-  markdown: `# Hello Markdown\n\nThis is a **bold** text and this is *italic*.\n\n- Item 1\n- Item 2`,
-};
-
 export function MonacoEditor({ value, onChange, language = "javascript", theme = "vs-dark" }: MonacoEditorProps) {
   const editorRef = useRef<any>(null);
   const [currentLanguage, setCurrentLanguage] = useState(language);
-
-  // uchováva kód pre každý jazyk, aby undo/redo fungovalo
+  
   const [codeHistory, setCodeHistory] = useState<{ [lang: string]: string }>({
     [language]: value,
   });
@@ -119,25 +102,6 @@ export function MonacoEditor({ value, onChange, language = "javascript", theme =
     onChange(valueToUse);
   };
 
-  const getFileExtension = (lang: string) => {
-    const map: Record<string, string> = {
-      javascript: "js",
-      typescript: "ts",
-      python: "py",
-      java: "java",
-      cpp: "cpp",
-      html: "html",
-      css: "css",
-      json: "json",
-      php: "php",
-      go: "go",
-      rust: "rs",
-      sql: "sql",
-      markdown: "md",
-    };
-    return map[lang] || "txt";
-  };
-
   return (
     <Card className="h-full glass border-primary/20 flex flex-col">
       <div className="p-4 border-b border-border flex items-center justify-between flex-wrap gap-2">
@@ -181,6 +145,7 @@ export function MonacoEditor({ value, onChange, language = "javascript", theme =
           theme="vibeCoding"
           onChange={handleEditorChange}
           onMount={handleEditorDidMount}
+          
           loading={<Loader2 className="animate-spin w-8 h-8" />}
           options={{
             minimap: { enabled: true },

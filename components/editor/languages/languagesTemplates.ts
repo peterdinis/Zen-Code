@@ -1,0 +1,15 @@
+export const languageTemplates: { [key: string]: string } = {
+  javascript: `console.log("Hello JavaScript!");`,
+  typescript: `const greet = (name: string) => \`Hello, \${name}!\`;\nconsole.log(greet("TypeScript"));`,
+  python: `def greet(name):\n    return f"Hello, {name}!"\n\nprint(greet("Python"))`,
+  java: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello Java!");\n    }\n}`,
+  cpp: `#include <iostream>\nint main() {\n    std::cout << "Hello C++!" << std::endl;\n    return 0;\n}`,
+  html: `<!DOCTYPE html>\n<html>\n<body>\n    <h1>Hello HTML!</h1>\n</body>\n</html>`,
+  css: `body {\n    background-color: #f0f0f0;\n    color: #333;\n}`,
+  json: `{\n  "message": "Hello JSON"\n}`,
+  php: `<?php\nfunction greet($name) {\n    return "Hello $name!";\n}\n\necho greet("PHP");\n?>`,
+  go: `package main\nimport "fmt"\nfunc main() {\n    fmt.Println("Hello Go!")\n}`,
+  rust: `fn main() {\n    println!("Hello Rust!");\n}`,
+  sql: `SELECT 'Hello SQL!' AS greeting;`,
+  markdown: `# Hello Markdown\n\nThis is a **bold** text and this is *italic*.\n\n- Item 1\n- Item 2`,
+};
