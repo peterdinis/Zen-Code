@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Toaster } from "sonner";
 import { Provider } from "react-redux";
 import { store } from "@/redux/store";
+import ReduxProvider from "@/components/providers/ReduxProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,12 +37,12 @@ export default function RootLayout({
           enableSystem
           defaultTheme='system'
           disableTransitionOnChange
-          storageKey='myNotionKey'
+          storageKey='zenCodeEditor'
         >
-          <Provider store={store}>
+          <ReduxProvider>
             {children}
             <Toaster />
-          </Provider>
+          </ReduxProvider>
         </ThemeProvider>
       </body>
     </html>

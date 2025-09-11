@@ -1,4 +1,5 @@
-"use client"
+// components/EditorLayout.tsx
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -22,6 +23,8 @@ import { MonacoEditor } from "./MonacoEditor";
 import { PreviewPanel } from "./PreviewEditor";
 import { Terminal } from "./Terminal";
 import { EditorSidebar } from "./EditorSidebar";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 import TemplateSection from "./TemplateSelection";
 
 const models = [
@@ -60,10 +63,14 @@ function App() {
     }
   ]);
 
+  // Get selected template from Redux store
+  const selectedTemplate = useSelector((state: RootState) => state.templates.selectedTemplate);
+
   const handleTemplateSelect = (templateCode: string, templateLanguage: string) => {
     setCode(templateCode);
     setLanguage(templateLanguage);
     setActivePanel("editor");
+    toast.success("Template loaded successfully!");
   };
 
   const handleSendPrompt = () => {
@@ -125,6 +132,14 @@ function App() {
                     <Sparkles className="w-3 h-3 mr-1" />
                     Editor
                   </Badge>
+                  {selectedTemplate && (
+                    <>
+                      <Separator orientation="vertical" className="h-6" />
+                      <Badge variant="outline" className="bg-accent/20 text-accent">
+                        Template: {selectedTemplate.name}
+                      </Badge>
+                    </>
+                  )}
                 </div>
                 
                 <div className="flex items-center space-x-3">
