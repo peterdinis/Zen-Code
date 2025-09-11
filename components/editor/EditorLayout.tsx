@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react";
 import Link from "next/link";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -16,12 +18,11 @@ import {
   Zap
 } from "lucide-react";
 import { toast } from "sonner";
-
-import { EditorSidebar } from "./EditorSidebar";
 import { MonacoEditor } from "./MonacoEditor";
-import { TemplateSelector } from "./TemplateSelector";
+import { TemplateSelector } from "./TemplateSelection";
+import { PreviewPanel } from "./PreviewEditor";
 import { Terminal } from "./Terminal";
-import { PreviewPanel } from "./PreviewPanel";
+import { EditorSidebar } from "./EditorSidebar";
 
 const models = [
   { id: "gpt-4", name: "GPT-4", provider: "OpenAI", color: "bg-primary" },
