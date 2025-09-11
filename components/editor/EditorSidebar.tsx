@@ -42,7 +42,6 @@ const sidebarItems = [
   {
     group: "Settings",
     items: [
-      { title: "Theme", icon: Palette, id: "theme" },
       { title: "Config", icon: Settings, id: "config" },
     ]
   }

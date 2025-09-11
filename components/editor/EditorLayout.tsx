@@ -23,6 +23,7 @@ import { TemplateSelector } from "./TemplateSelection";
 import { PreviewPanel } from "./PreviewEditor";
 import { Terminal } from "./Terminal";
 import { EditorSidebar } from "./EditorSidebar";
+import { ModeToggle } from "../shared/ThemeToggle";
 
 const models = [
   { id: "gpt-4", name: "GPT-4", provider: "OpenAI", color: "bg-primary" },
@@ -146,6 +147,7 @@ function App() {
                       ))}
                     </SelectContent>
                   </Select>
+                   <ModeToggle />
                 </div>
               </div>
             </div>
