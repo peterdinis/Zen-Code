@@ -17,48 +17,24 @@ interface MonacoEditorProps {
 }
 
 const languageTemplates: { [key: string]: string } = {
-  javascript: `// JavaScript starter code
-console.log("Hello JavaScript!");`,
-  typescript: `// TypeScript starter code
-const greet = (name: string) => \`Hello, \${name}!\`;
-console.log(greet("TypeScript"));`,
-  python: `# Python starter code
-def greet(name):
-    return f"Hello, {name}!"
-
-print(greet("Python"))`,
-  java: `// Java starter code
-public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello Java!");
-    }
-}`,
-  cpp: `// C++ starter code
-#include <iostream>
-int main() {
-    std::cout << "Hello C++!" << std::endl;
-    return 0;
-}`,
-  html: `<!-- HTML starter code -->
-<!DOCTYPE html>
-<html>
-<body>
-    <h1>Hello HTML!</h1>
-</body>
-</html>`,
-  css: `/* CSS starter code */
-body {
-    background-color: #f0f0f0;
-    color: #333;
-}`,
-  json: `{
-  "message": "Hello JSON"
-}`,
+  javascript: `console.log("Hello JavaScript!");`,
+  typescript: `const greet = (name: string) => \`Hello, \${name}!\`;\nconsole.log(greet("TypeScript"));`,
+  python: `def greet(name):\n    return f"Hello, {name}!"\n\nprint(greet("Python"))`,
+  java: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello Java!");\n    }\n}`,
+  cpp: `#include <iostream>\nint main() {\n    std::cout << "Hello C++!" << std::endl;\n    return 0;\n}`,
+  html: `<!DOCTYPE html>\n<html>\n<body>\n    <h1>Hello HTML!</h1>\n</body>\n</html>`,
+  css: `body {\n    background-color: #f0f0f0;\n    color: #333;\n}`,
+  json: `{\n  "message": "Hello JSON"\n}`,
 };
 
 export function MonacoEditor({ value, onChange, language = "javascript", theme = "vs-dark" }: MonacoEditorProps) {
   const editorRef = useRef<any>(null);
   const [currentLanguage, setCurrentLanguage] = useState(language);
+
+  // store code per language to preserve undo/redo and edits
+  const [codeHistory, setCodeHistory] = useState<{ [lang: string]: string }>({
+    [language]: value,
+  });
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
@@ -88,30 +64,68 @@ export function MonacoEditor({ value, onChange, language = "javascript", theme =
   };
 
   const handleRunCode = () => toast.success("Code executed! ⚡");
+
   const handleCopyCode = async () => {
-    await navigator.clipboard.writeText(value);
-    toast.success("Code copied to clipboard!");
+    try {
+      await navigator.clipboard.writeText(codeHistory[currentLanguage]);
+      toast.success("Code copied to clipboard!");
+    } catch {
+      toast.error("Failed to copy code!");
+    }
   };
+
   const handleDownload = () => {
-    const blob = new Blob([value], { type: "text/plain" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `code.${currentLanguage}`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    toast.success("File downloaded!");
+    try {
+      const blob = new Blob([codeHistory[currentLanguage]], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `code.${getFileExtension(currentLanguage)}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("File downloaded!");
+    } catch {
+      toast.error("Failed to download file!");
+    }
   };
+
   const handleFormat = () => {
     if (editorRef.current) {
-      editorRef.current.trigger("source", "editor.action.formatDocument");
+      editorRef.current.getAction("editor.action.formatDocument")?.run();
       toast.success("Code formatted!");
     }
   };
 
   const handleLanguageChange = (lang: string) => {
     setCurrentLanguage(lang);
-    onChange(languageTemplates[lang] || "");
+    // initialize code if first time switching to this language
+    if (!codeHistory[lang]) {
+      setCodeHistory(prev => ({ ...prev, [lang]: languageTemplates[lang] || "" }));
+    }
+    onChange(codeHistory[lang] || languageTemplates[lang] || "");
+  };
+
+  const handleEditorChange = (newValue: string | undefined) => {
+  const valueToUse = newValue ?? "";
+  setCodeHistory(prev => ({ ...prev, [currentLanguage]: valueToUse }));
+  onChange(valueToUse);
+};
+
+
+  const getFileExtension = (lang: string) => {
+    const map: Record<string, string> = {
+      javascript: "js",
+      typescript: "ts",
+      python: "py",
+      java: "java",
+      cpp: "cpp",
+      html: "html",
+      css: "css",
+      json: "json",
+    };
+    return map[lang] || "txt";
   };
 
   return (
@@ -129,7 +143,7 @@ export function MonacoEditor({ value, onChange, language = "javascript", theme =
               <SelectValue placeholder="Language" />
             </SelectTrigger>
             <SelectContent>
-              {Object.keys(languageTemplates).map((lang) => (
+              {Object.keys(languageTemplates).map(lang => (
                 <SelectItem key={lang} value={lang}>
                   {lang.charAt(0).toUpperCase() + lang.slice(1)}
                 </SelectItem>
@@ -152,10 +166,10 @@ export function MonacoEditor({ value, onChange, language = "javascript", theme =
 
       <div className="flex-1">
         <Editor
-          value={value}
+          value={codeHistory[currentLanguage] || ""}
           language={currentLanguage}
           theme="vibeCoding"
-          onChange={(newValue) => onChange(newValue || "")}
+          onChange={handleEditorChange}
           onMount={handleEditorDidMount}
           options={{
             minimap: { enabled: true },
