@@ -16,6 +16,7 @@ interface MonacoEditorProps {
   theme?: string;
 }
 
+// Šablóny pre viacero jazykov
 const languageTemplates: { [key: string]: string } = {
   javascript: `console.log("Hello JavaScript!");`,
   typescript: `const greet = (name: string) => \`Hello, \${name}!\`;\nconsole.log(greet("TypeScript"));`,
@@ -25,13 +26,18 @@ const languageTemplates: { [key: string]: string } = {
   html: `<!DOCTYPE html>\n<html>\n<body>\n    <h1>Hello HTML!</h1>\n</body>\n</html>`,
   css: `body {\n    background-color: #f0f0f0;\n    color: #333;\n}`,
   json: `{\n  "message": "Hello JSON"\n}`,
+  php: `<?php\nfunction greet($name) {\n    return "Hello $name!";\n}\n\necho greet("PHP");\n?>`,
+  go: `package main\nimport "fmt"\nfunc main() {\n    fmt.Println("Hello Go!")\n}`,
+  rust: `fn main() {\n    println!("Hello Rust!");\n}`,
+  sql: `SELECT 'Hello SQL!' AS greeting;`,
+  markdown: `# Hello Markdown\n\nThis is a **bold** text and this is *italic*.\n\n- Item 1\n- Item 2`,
 };
 
 export function MonacoEditor({ value, onChange, language = "javascript", theme = "vs-dark" }: MonacoEditorProps) {
   const editorRef = useRef<any>(null);
   const [currentLanguage, setCurrentLanguage] = useState(language);
 
-  // store code per language to preserve undo/redo and edits
+  // uchováva kód pre každý jazyk, aby undo/redo fungovalo
   const [codeHistory, setCodeHistory] = useState<{ [lang: string]: string }>({
     [language]: value,
   });
@@ -100,7 +106,7 @@ export function MonacoEditor({ value, onChange, language = "javascript", theme =
 
   const handleLanguageChange = (lang: string) => {
     setCurrentLanguage(lang);
-    // initialize code if first time switching to this language
+    // inicializuj kód ak je prvýkrát prepnutý jazyk
     if (!codeHistory[lang]) {
       setCodeHistory(prev => ({ ...prev, [lang]: languageTemplates[lang] || "" }));
     }
@@ -108,11 +114,10 @@ export function MonacoEditor({ value, onChange, language = "javascript", theme =
   };
 
   const handleEditorChange = (newValue: string | undefined) => {
-  const valueToUse = newValue ?? "";
-  setCodeHistory(prev => ({ ...prev, [currentLanguage]: valueToUse }));
-  onChange(valueToUse);
-};
-
+    const valueToUse = newValue ?? "";
+    setCodeHistory(prev => ({ ...prev, [currentLanguage]: valueToUse }));
+    onChange(valueToUse);
+  };
 
   const getFileExtension = (lang: string) => {
     const map: Record<string, string> = {
@@ -124,6 +129,11 @@ export function MonacoEditor({ value, onChange, language = "javascript", theme =
       html: "html",
       css: "css",
       json: "json",
+      php: "php",
+      go: "go",
+      rust: "rs",
+      sql: "sql",
+      markdown: "md",
     };
     return map[lang] || "txt";
   };
