@@ -1,4 +1,5 @@
-"use client"
+// components/EditorLayout.tsx
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -9,20 +10,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { 
-  Code, 
-  Brain, 
-  Send, 
+import {
+  Code,
+  Brain,
+  Send,
   Sparkles,
   Settings,
   Zap
 } from "lucide-react";
 import { toast } from "sonner";
 import { MonacoEditor } from "./MonacoEditor";
-import { TemplateSelector } from "./TemplateSelection";
 import { PreviewPanel } from "./PreviewEditor";
 import { Terminal } from "./Terminal";
 import { EditorSidebar } from "./EditorSidebar";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import TemplateSection from "./TemplateSelection";
 
 const models = [
   { id: "gpt-4", name: "GPT-4", provider: "OpenAI", color: "bg-primary" },
@@ -50,7 +53,7 @@ import React from 'react';
 function App() {
   return <h1>Hello VibeCoding!</h1>;
 }`);
-  
+
   const [language, setLanguage] = useState("javascript");
   const [prompt, setPrompt] = useState("");
   const [chatHistory, setChatHistory] = useState([
@@ -60,26 +63,30 @@ function App() {
     }
   ]);
 
+  // Get selected template from Redux store
+  const selectedTemplate = useSelector((state: RootState) => state.templates.selectedTemplate);
+
   const handleTemplateSelect = (templateCode: string, templateLanguage: string) => {
     setCode(templateCode);
     setLanguage(templateLanguage);
     setActivePanel("editor");
+    toast.success("Template loaded successfully!");
   };
 
   const handleSendPrompt = () => {
     if (!prompt.trim()) return;
-    
+
     const userMessage = { role: "user", content: prompt };
     setChatHistory(prev => [...prev, userMessage]);
-    
+
     setTimeout(() => {
       const aiResponse = {
-        role: "assistant", 
+        role: "assistant",
         content: `Great question! Here's how I can help you with "${prompt.slice(0, 50)}..."\n\nI can help you improve this code, add new features, or explain how it works.`
       };
       setChatHistory(prev => [...prev, aiResponse]);
     }, 1000);
-    
+
     setPrompt("");
     toast("Sent to " + models.find(m => m.id === selectedModel)?.name);
   };
@@ -89,7 +96,7 @@ function App() {
       case "editor":
         return <MonacoEditor value={code} onChange={setCode} language={language} />;
       case "templates":
-        return <TemplateSelector onTemplateSelect={handleTemplateSelect} />;
+        return <TemplateSection onTemplateSelect={handleTemplateSelect} />;
       case "preview":
         return <PreviewPanel code={code} language={language} />;
       case "terminal":
@@ -106,7 +113,7 @@ function App() {
       <div className="min-h-screen flex w-full bg-background">
         {/* Animated background */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none"></div>
-        
+
         <div className="flex flex-col w-full relative z-10">
           {/* Header */}
           <header className="border-b border-border bg-card/50 backdrop-blur-sm">
@@ -125,8 +132,16 @@ function App() {
                     <Sparkles className="w-3 h-3 mr-1" />
                     Editor
                   </Badge>
+                  {selectedTemplate && (
+                    <>
+                      <Separator orientation="vertical" className="h-6" />
+                      <Badge variant="outline" className="bg-accent/20 text-accent">
+                        Template: {selectedTemplate.name}
+                      </Badge>
+                    </>
+                  )}
                 </div>
-                
+
                 <div className="flex items-center space-x-3">
                   <Select value={selectedModel} onValueChange={setSelectedModel}>
                     <SelectTrigger className="w-48 glass border-primary/20">
@@ -153,8 +168,8 @@ function App() {
 
           <div className="flex flex-1">
             {/* Sidebar */}
-            <EditorSidebar 
-              activePanel={activePanel} 
+            <EditorSidebar
+              activePanel={activePanel}
               onPanelChange={setActivePanel}
             />
 
@@ -166,9 +181,10 @@ function App() {
               </div>
 
               {/* AI Chat Panel */}
-              <div className="w-96 p-6 border-l border-border">
+              {/* AI Chat Panel */}
+              <div className="w-96 p-6 border-l border-border flex flex-col">
                 <Card className="h-full glass flex flex-col">
-                  <div className="p-4 border-b border-border">
+                  <div className="p-4 border-b border-border flex-shrink-0">
                     <div className="flex items-center space-x-2">
                       <Brain className="w-5 h-5 text-accent" />
                       <span className="font-semibold">AI Assistant</span>
@@ -177,41 +193,52 @@ function App() {
                       </Badge>
                     </div>
                   </div>
-                  
-                  {/* Chat Messages */}
-                  <div className="flex-1 p-4 overflow-y-auto space-y-4">
+
+                  {/* Chat Messages - Scrollable area */}
+                  <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
                     {chatHistory.map((message, index) => (
                       <div
                         key={index}
                         className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`max-w-[80%] p-3 rounded-lg ${
-                            message.role === 'user'
+                          className={`max-w-[80%] p-3 rounded-lg ${message.role === 'user'
                               ? 'bg-primary text-primary-foreground'
                               : 'bg-muted'
-                          }`}
+                            }`}
                         >
                           <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                         </div>
                       </div>
                     ))}
+
+                    {/* Empty state */}
+                    {chatHistory.length === 1 && (
+                      <div className="flex items-center justify-center h-full text-center text-muted-foreground">
+                        <div>
+                          <Brain className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">Welcome to VibeCoding! I'm here to help you code with AI vibes.</p>
+                          <p className="text-xs mt-1">What would you like to build today?</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Chat Input */}
-                  <div className="p-4 border-t border-border">
+                  {/* Chat Input - Fixed at bottom */}
+                  <div className="p-4 border-t border-border flex-shrink-0">
                     <div className="flex space-x-2">
                       <Input
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder="Ask AI for help..."
-                        className="glass"
+                        className="glass flex-1"
                         onKeyPress={(e) => e.key === 'Enter' && handleSendPrompt()}
                       />
-                      <Button 
-                        size="icon" 
+                      <Button
+                        size="icon"
                         onClick={handleSendPrompt}
                         className="shrink-0"
+                        disabled={!prompt.trim()}
                       >
                         <Send className="w-4 h-4" />
                       </Button>
@@ -220,16 +247,6 @@ function App() {
                 </Card>
               </div>
             </div>
-          </div>
-
-          {/* Floating Action Buttons */}
-          <div className="fixed bottom-6 right-6 space-y-3 z-50">
-            <Button size="icon" className="animate-float shadow-lg">
-              <Settings className="w-5 h-5" />
-            </Button>
-            <Button size="icon" className="animate-float shadow-lg" style={{ animationDelay: "1s" }}>
-              <Zap className="w-5 h-5" />
-            </Button>
           </div>
         </div>
       </div>
