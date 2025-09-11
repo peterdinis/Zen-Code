@@ -20,6 +20,8 @@ import {
   Database
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Separator } from "@/components/ui/separator";
 
 const sidebarItems = [
   {
@@ -54,35 +56,63 @@ interface EditorSidebarProps {
 
 export function EditorSidebar({ activePanel, onPanelChange, collapsed = false }: EditorSidebarProps) {
   return (
-    <Sidebar className={cn("border-r border-border bg-card/50", collapsed ? "w-14" : "w-60")}>
+    <Sidebar
+      className={cn(
+        "border-r border-border bg-card/50 transition-all duration-300 ease-in-out",
+        collapsed ? "w-14" : "w-60"
+      )}
+    >
       <SidebarContent>
-        {sidebarItems.map((group) => (
-          <SidebarGroup key={group.group}>
-            <SidebarGroupLabel className="text-muted-foreground">
-              {!collapsed && group.group}
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {group.items.map((item) => (
-                  <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton
-                      onClick={() => onPanelChange(item.id)}
-                      className={cn(
-                        "cursor-pointer transition-all duration-200",
-                        activePanel === item.id 
-                          ? "bg-primary/20 text-primary font-medium border-r-2 border-primary" 
-                          : "hover:bg-muted/50"
-                      )}
-                    >
-                      <item.icon className="w-4 h-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+        <TooltipProvider>
+          {sidebarItems.map((group, idx) => (
+            <div key={group.group}>
+              <SidebarGroup>
+                {/* Group Label */}
+                {!collapsed && (
+                  <SidebarGroupLabel className="text-muted-foreground text-xs tracking-wide px-2 py-1">
+                    {group.group}
+                  </SidebarGroupLabel>
+                )}
+
+                {/* Group Content */}
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {group.items.map((item) => (
+                      <SidebarMenuItem key={item.id}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <SidebarMenuButton
+                              onClick={() => onPanelChange(item.id)}
+                              className={cn(
+                                "cursor-pointer transition-all duration-200 flex items-center gap-2",
+                                activePanel === item.id 
+                                  ? "bg-primary/20 text-primary font-medium border-r-2 border-primary" 
+                                  : "hover:bg-muted/50"
+                              )}
+                            >
+                              <item.icon className="w-4 h-4 shrink-0" />
+                              {!collapsed && <span>{item.title}</span>}
+                            </SidebarMenuButton>
+                          </TooltipTrigger>
+                          {collapsed && (
+                            <TooltipContent side="right">
+                              {item.title}
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+
+              {/* Separator between groups */}
+              {idx < sidebarItems.length - 1 && (
+                <Separator className="my-2 opacity-40" />
+              )}
+            </div>
+          ))}
+        </TooltipProvider>
       </SidebarContent>
     </Sidebar>
   );
