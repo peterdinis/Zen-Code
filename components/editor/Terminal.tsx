@@ -251,10 +251,20 @@ const commonCommands = [
   { name: "git add .", description: "Stage all changes" },
 ];
 
-interface TerminalProps {
-  selectedTemplate?: string;
-  onPackageInstall?: (packageName: string, isDev?: boolean) => void;
-}
+const packages = [
+  {
+    name: "react",
+    description: "JavaScript library for building user interfaces",
+  },
+  { name: "lodash", description: "Utility library for JavaScript" },
+  { name: "axios", description: "HTTP client for the browser and node.js" },
+  { name: "moment", description: "Parse, validate, manipulate dates" },
+  {
+    name: "express",
+    description: "Fast, unopinionated, minimalist web framework",
+  },
+  { name: "typescript", description: "Typed superset of JavaScript" },
+];
 
 export function Terminal({
   selectedTemplate,
@@ -313,51 +323,28 @@ export function Terminal({
       let status: "success" | "error" = "success";
 
       if (input.startsWith("npm install")) {
-        const packageName = input.replace("npm install", "").trim();
-        output = `📦 Installing ${packageName || "packages"}...\n✅ Package installed successfully!`;
-
-        if (packageName && onPackageInstall) {
-          const isDev = input.includes("--save-dev") || input.includes("-D");
-          onPackageInstall(packageName, isDev);
-        }
-
+        output = `✓ Installing packages...\n✓ Package installed successfully!`;
         toast.success("Package installed!");
       } else if (input.startsWith("npm run")) {
-        const script = input.replace("npm run", "").trim();
-        output = `🚀 Running ${script || "script"}...\n✅ Script executed successfully!`;
+        output = `✓ Running script...\n✓ Script executed successfully!`;
         toast.success("Script executed!");
       } else if (input.startsWith("git")) {
-        output = `🌿 Git command executed\n✅ Repository updated!`;
+        output = `✓ Git command executed\n✓ Repository updated!`;
         toast.success("Git command executed!");
       } else if (input === "clear") {
         setCommands([]);
         return;
       } else if (input === "help") {
         output = `Available commands:
-📦 npm install [package]  : Install npm package
-🔧 npm run [script]       : Run npm script
-🌿 git [command]          : Git operations
-🧹 clear                  : Clear terminal
-❓ help                   : Show this help
-📋 template-info          : Show current template information`;
-      } else if (input === "template-info") {
-        if (selectedTemplate) {
-          const packages =
-            templatePackages[selectedTemplate] || templatePackages["default"];
-          output = `📋 Template: ${selectedTemplate}\n📦 Available packages:\n${packages
-            .map(
-              (pkg) =>
-                `  • ${pkg.name}${pkg.devDependency ? " (dev)" : ""} - ${pkg.description}`,
-            )
-            .join("\n")}`;
-        } else {
-          output = "No template selected. Please select a template first.";
-          status = "error";
-        }
+- npm install [package]  : Install npm package
+- npm run [script]       : Run npm script
+- git [command]          : Git operations
+- clear                  : Clear terminal
+- help                   : Show this help`;
       } else if (input.trim() === "") {
         return;
       } else {
-        output = `❌ Command '${input}' not found. Type 'help' for available commands.`;
+        output = `Command '${input}' not found. Type 'help' for available commands.`;
         status = "error";
       }
 
@@ -502,11 +489,7 @@ export function Terminal({
                 placeholder="Type a command..."
                 className="font-mono bg-transparent border-0 focus:ring-1 focus:ring-primary"
               />
-              <Button
-                size="sm"
-                onClick={() => executeCommand(currentInput)}
-                disabled={!currentInput.trim()}
-              >
+              <Button size="sm" onClick={() => executeCommand(currentInput)}>
                 <Play className="w-4 h-4" />
               </Button>
             </div>
@@ -535,20 +518,28 @@ export function Terminal({
         </Card>
       ) : (
         <Card className="glass p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold flex items-center space-x-2">
-              <Package className="w-5 h-5 text-primary" />
-              <span>
-                {selectedTemplate
-                  ? `${selectedTemplate} Packages`
-                  : "Popular Packages"}
-              </span>
-            </h3>
-            {selectedTemplate && (
-              <Badge variant="outline">
-                {getCurrentPackages().length} packages
-              </Badge>
-            )}
+          <h3 className="font-semibold mb-4 flex items-center space-x-2">
+            <Package className="w-5 h-5 text-primary" />
+            <span>Popular Packages</span>
+          </h3>
+          <div className="grid gap-3">
+            {packages.map((pkg) => (
+              <div
+                key={pkg.name}
+                className="flex items-center justify-between p-3 border border-border/50 rounded-lg hover:border-primary/50 transition-colors"
+              >
+                <div>
+                  <h4 className="font-medium">{pkg.name}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {pkg.description}
+                  </p>
+                </div>
+                <Button size="sm" onClick={() => installPackage(pkg.name)}>
+                  <Download className="w-4 h-4 mr-1" />
+                  Install
+                </Button>
+              </div>
+            ))}
           </div>
 
           {!selectedTemplate ? (
