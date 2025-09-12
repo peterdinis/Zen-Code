@@ -269,7 +269,7 @@ const packages = [
 export function Terminal({
   selectedTemplate,
   onPackageInstall,
-}: TerminalProps) {
+}: any) {
   const [currentInput, setCurrentInput] = useState("");
   const [commands, setCommands] = useState<Command[]>([
     {
