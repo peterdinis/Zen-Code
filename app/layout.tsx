@@ -33,11 +33,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider
-          attribute='class'
+          attribute="class"
           enableSystem
-          defaultTheme='system'
+          defaultTheme="system"
           disableTransitionOnChange
-          storageKey='zenCodeEditor'
+          storageKey="zenCodeEditor"
         >
           <ReduxProvider>
             {children}
