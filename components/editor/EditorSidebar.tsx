@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Sidebar,
@@ -10,17 +10,22 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { 
-  Code, 
-  FileText, 
-  Terminal, 
-  Settings, 
+import {
+  Code,
+  FileText,
+  Terminal,
+  Settings,
   Eye,
   Palette,
-  Database
+  Database,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
 
 const sidebarItems = [
@@ -30,22 +35,22 @@ const sidebarItems = [
       { title: "Editor", icon: Code, id: "editor" },
       { title: "Templates", icon: FileText, id: "templates" },
       { title: "Preview", icon: Eye, id: "preview" },
-    ]
+    ],
   },
   {
-    group: "Tools", 
+    group: "Tools",
     items: [
       { title: "Terminal", icon: Terminal, id: "terminal" },
       { title: "Packages", icon: Database, id: "packages" },
-    ]
+    ],
   },
   {
     group: "Settings",
     items: [
       { title: "Theme", icon: Palette, id: "theme" },
       { title: "Config", icon: Settings, id: "config" },
-    ]
-  }
+    ],
+  },
 ];
 
 interface EditorSidebarProps {
@@ -54,12 +59,16 @@ interface EditorSidebarProps {
   collapsed?: boolean;
 }
 
-export function EditorSidebar({ activePanel, onPanelChange, collapsed = false }: EditorSidebarProps) {
+export function EditorSidebar({
+  activePanel,
+  onPanelChange,
+  collapsed = false,
+}: EditorSidebarProps) {
   return (
     <Sidebar
       className={cn(
         "border-r border-border bg-card/50 transition-all duration-300 ease-in-out",
-        collapsed ? "w-14" : "w-60"
+        collapsed ? "w-14" : "w-60",
       )}
     >
       <SidebarContent>
@@ -85,9 +94,9 @@ export function EditorSidebar({ activePanel, onPanelChange, collapsed = false }:
                               onClick={() => onPanelChange(item.id)}
                               className={cn(
                                 "cursor-pointer transition-all duration-200 flex items-center gap-2",
-                                activePanel === item.id 
-                                  ? "bg-primary/20 text-primary font-medium border-r-2 border-primary" 
-                                  : "hover:bg-muted/50"
+                                activePanel === item.id
+                                  ? "bg-primary/20 text-primary font-medium border-r-2 border-primary"
+                                  : "hover:bg-muted/50",
                               )}
                             >
                               <item.icon className="w-4 h-4 shrink-0" />

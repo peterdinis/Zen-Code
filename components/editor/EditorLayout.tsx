@@ -6,18 +6,17 @@ import Link from "next/link";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Code,
-  Brain,
-  Send,
-  Sparkles,
-  Settings,
-  Zap
-} from "lucide-react";
+import { Code, Brain, Send, Sparkles, Settings, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { MonacoEditor } from "./MonacoEditor";
 import { PreviewPanel } from "./PreviewEditor";
@@ -30,8 +29,18 @@ import TemplateSection from "./TemplateSelection";
 const models = [
   { id: "gpt-4", name: "GPT-4", provider: "OpenAI", color: "bg-primary" },
   { id: "claude", name: "Claude", provider: "Anthropic", color: "bg-accent" },
-  { id: "gpt-3.5", name: "GPT-3.5 Turbo", provider: "OpenAI", color: "bg-electric-blue" },
-  { id: "gemini", name: "Gemini Pro", provider: "Google", color: "bg-neon-pink" },
+  {
+    id: "gpt-3.5",
+    name: "GPT-3.5 Turbo",
+    provider: "OpenAI",
+    color: "bg-electric-blue",
+  },
+  {
+    id: "gemini",
+    name: "Gemini Pro",
+    provider: "Google",
+    color: "bg-neon-pink",
+  },
 ];
 
 export function EditorLayout() {
@@ -59,14 +68,20 @@ function App() {
   const [chatHistory, setChatHistory] = useState([
     {
       role: "assistant",
-      content: "Welcome to VibeCoding! I'm here to help you code with AI vibes. What would you like to build today?"
-    }
+      content:
+        "Welcome to VibeCoding! I'm here to help you code with AI vibes. What would you like to build today?",
+    },
   ]);
 
   // Get selected template from Redux store
-  const selectedTemplate = useSelector((state: RootState) => state.templates.selectedTemplate);
+  const selectedTemplate = useSelector(
+    (state: RootState) => state.templates.selectedTemplate,
+  );
 
-  const handleTemplateSelect = (templateCode: string, templateLanguage: string) => {
+  const handleTemplateSelect = (
+    templateCode: string,
+    templateLanguage: string,
+  ) => {
     setCode(templateCode);
     setLanguage(templateLanguage);
     setActivePanel("editor");
@@ -77,24 +92,26 @@ function App() {
     if (!prompt.trim()) return;
 
     const userMessage = { role: "user", content: prompt };
-    setChatHistory(prev => [...prev, userMessage]);
+    setChatHistory((prev) => [...prev, userMessage]);
 
     setTimeout(() => {
       const aiResponse = {
         role: "assistant",
-        content: `Great question! Here's how I can help you with "${prompt.slice(0, 50)}..."\n\nI can help you improve this code, add new features, or explain how it works.`
+        content: `Great question! Here's how I can help you with "${prompt.slice(0, 50)}..."\n\nI can help you improve this code, add new features, or explain how it works.`,
       };
-      setChatHistory(prev => [...prev, aiResponse]);
+      setChatHistory((prev) => [...prev, aiResponse]);
     }, 1000);
 
     setPrompt("");
-    toast("Sent to " + models.find(m => m.id === selectedModel)?.name);
+    toast("Sent to " + models.find((m) => m.id === selectedModel)?.name);
   };
 
   const renderMainContent = () => {
     switch (activePanel) {
       case "editor":
-        return <MonacoEditor value={code} onChange={setCode} language={language} />;
+        return (
+          <MonacoEditor value={code} onChange={setCode} language={language} />
+        );
       case "templates":
         return <TemplateSection onTemplateSelect={handleTemplateSelect} />;
       case "preview":
@@ -104,7 +121,9 @@ function App() {
       case "packages":
         return <Terminal />;
       default:
-        return <MonacoEditor value={code} onChange={setCode} language={language} />;
+        return (
+          <MonacoEditor value={code} onChange={setCode} language={language} />
+        );
     }
   };
 
@@ -121,21 +140,30 @@ function App() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <SidebarTrigger className="hover:bg-muted/50" />
-                  <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+                  <Link
+                    href="/"
+                    className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+                  >
                     <Code className="w-6 h-6 text-primary" />
                     <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
                       VibeCoding
                     </span>
                   </Link>
                   <Separator orientation="vertical" className="h-6" />
-                  <Badge variant="secondary" className="bg-primary/20 text-primary">
+                  <Badge
+                    variant="secondary"
+                    className="bg-primary/20 text-primary"
+                  >
                     <Sparkles className="w-3 h-3 mr-1" />
                     Editor
                   </Badge>
                   {selectedTemplate && (
                     <>
                       <Separator orientation="vertical" className="h-6" />
-                      <Badge variant="outline" className="bg-accent/20 text-accent">
+                      <Badge
+                        variant="outline"
+                        className="bg-accent/20 text-accent"
+                      >
                         Template: {selectedTemplate.name}
                       </Badge>
                     </>
@@ -143,15 +171,20 @@ function App() {
                 </div>
 
                 <div className="flex items-center space-x-3">
-                  <Select value={selectedModel} onValueChange={setSelectedModel}>
+                  <Select
+                    value={selectedModel}
+                    onValueChange={setSelectedModel}
+                  >
                     <SelectTrigger className="w-48 glass border-primary/20">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="glass">
-                      {models.map(model => (
+                      {models.map((model) => (
                         <SelectItem key={model.id} value={model.id}>
                           <div className="flex items-center space-x-2">
-                            <div className={`w-2 h-2 rounded-full ${model.color}`} />
+                            <div
+                              className={`w-2 h-2 rounded-full ${model.color}`}
+                            />
                             <span>{model.name}</span>
                             <Badge variant="outline" className="text-xs">
                               {model.provider}
@@ -176,9 +209,7 @@ function App() {
             {/* Main Content Area */}
             <div className="flex-1 flex">
               {/* Code/Content Panel */}
-              <div className="flex-1 p-6">
-                {renderMainContent()}
-              </div>
+              <div className="flex-1 p-6">{renderMainContent()}</div>
 
               {/* AI Chat Panel */}
               {/* AI Chat Panel */}
@@ -189,7 +220,7 @@ function App() {
                       <Brain className="w-5 h-5 text-accent" />
                       <span className="font-semibold">AI Assistant</span>
                       <Badge className="bg-accent/20 text-accent">
-                        {models.find(m => m.id === selectedModel)?.name}
+                        {models.find((m) => m.id === selectedModel)?.name}
                       </Badge>
                     </div>
                   </div>
@@ -199,15 +230,18 @@ function App() {
                     {chatHistory.map((message, index) => (
                       <div
                         key={index}
-                        className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-[80%] p-3 rounded-lg ${message.role === 'user'
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-muted'
-                            }`}
+                          className={`max-w-[80%] p-3 rounded-lg ${
+                            message.role === "user"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted"
+                          }`}
                         >
-                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                          <p className="text-sm whitespace-pre-wrap">
+                            {message.content}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -217,8 +251,13 @@ function App() {
                       <div className="flex items-center justify-center h-full text-center text-muted-foreground">
                         <div>
                           <Brain className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                          <p className="text-sm">Welcome to VibeCoding! I'm here to help you code with AI vibes.</p>
-                          <p className="text-xs mt-1">What would you like to build today?</p>
+                          <p className="text-sm">
+                            Welcome to VibeCoding! I'm here to help you code
+                            with AI vibes.
+                          </p>
+                          <p className="text-xs mt-1">
+                            What would you like to build today?
+                          </p>
                         </div>
                       </div>
                     )}
@@ -232,7 +271,9 @@ function App() {
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder="Ask AI for help..."
                         className="glass flex-1"
-                        onKeyPress={(e) => e.key === 'Enter' && handleSendPrompt()}
+                        onKeyPress={(e) =>
+                          e.key === "Enter" && handleSendPrompt()
+                        }
                       />
                       <Button
                         size="icon"

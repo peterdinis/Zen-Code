@@ -5,7 +5,13 @@ import Editor, { OnMount } from "@monaco-editor/react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Play, Copy, Download, RotateCcw, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { languageTemplates } from "./languages/languagesTemplates";
@@ -17,10 +23,15 @@ interface MonacoEditorProps {
   language?: string;
   theme?: string;
 }
-export function MonacoEditor({ value, onChange, language = "javascript", theme = "vs-dark" }: MonacoEditorProps) {
+export function MonacoEditor({
+  value,
+  onChange,
+  language = "javascript",
+  theme = "vs-dark",
+}: MonacoEditorProps) {
   const editorRef = useRef<any>(null);
   const [currentLanguage, setCurrentLanguage] = useState(language);
-  
+
   const [codeHistory, setCodeHistory] = useState<{ [lang: string]: string }>({
     [language]: value,
   });
@@ -65,7 +76,9 @@ export function MonacoEditor({ value, onChange, language = "javascript", theme =
 
   const handleDownload = () => {
     try {
-      const blob = new Blob([codeHistory[currentLanguage]], { type: "text/plain" });
+      const blob = new Blob([codeHistory[currentLanguage]], {
+        type: "text/plain",
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -91,14 +104,17 @@ export function MonacoEditor({ value, onChange, language = "javascript", theme =
     setCurrentLanguage(lang);
     // inicializuj kód ak je prvýkrát prepnutý jazyk
     if (!codeHistory[lang]) {
-      setCodeHistory(prev => ({ ...prev, [lang]: languageTemplates[lang] || "" }));
+      setCodeHistory((prev) => ({
+        ...prev,
+        [lang]: languageTemplates[lang] || "",
+      }));
     }
     onChange(codeHistory[lang] || languageTemplates[lang] || "");
   };
 
   const handleEditorChange = (newValue: string | undefined) => {
     const valueToUse = newValue ?? "";
-    setCodeHistory(prev => ({ ...prev, [currentLanguage]: valueToUse }));
+    setCodeHistory((prev) => ({ ...prev, [currentLanguage]: valueToUse }));
     onChange(valueToUse);
   };
 
@@ -117,7 +133,7 @@ export function MonacoEditor({ value, onChange, language = "javascript", theme =
               <SelectValue placeholder="Language" />
             </SelectTrigger>
             <SelectContent>
-              {Object.keys(languageTemplates).map(lang => (
+              {Object.keys(languageTemplates).map((lang) => (
                 <SelectItem key={lang} value={lang}>
                   {lang.charAt(0).toUpperCase() + lang.slice(1)}
                 </SelectItem>
@@ -131,10 +147,19 @@ export function MonacoEditor({ value, onChange, language = "javascript", theme =
         </div>
 
         <div className="flex items-center space-x-2 flex-wrap">
-          <Button variant="ghost" size="sm" onClick={handleCopyCode}><Copy className="w-4 h-4" /></Button>
-          <Button variant="ghost" size="sm" onClick={handleFormat}><RotateCcw className="w-4 h-4" /></Button>
-          <Button variant="ghost" size="sm" onClick={handleDownload}><Download className="w-4 h-4" /></Button>
-          <Button size="sm" onClick={handleRunCode}><Play className="w-4 h-4 mr-1" />Run</Button>
+          <Button variant="ghost" size="sm" onClick={handleCopyCode}>
+            <Copy className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleFormat}>
+            <RotateCcw className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleDownload}>
+            <Download className="w-4 h-4" />
+          </Button>
+          <Button size="sm" onClick={handleRunCode}>
+            <Play className="w-4 h-4 mr-1" />
+            Run
+          </Button>
         </div>
       </div>
 
@@ -145,7 +170,6 @@ export function MonacoEditor({ value, onChange, language = "javascript", theme =
           theme="vibeCoding"
           onChange={handleEditorChange}
           onMount={handleEditorDidMount}
-          
           loading={<Loader2 className="animate-spin w-8 h-8" />}
           options={{
             minimap: { enabled: true },

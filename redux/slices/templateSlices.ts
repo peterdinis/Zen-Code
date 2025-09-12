@@ -1,15 +1,15 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Template, TemplateState } from '../types/templateTypes';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Template, TemplateState } from "../types/templateTypes";
 
 const initialState: TemplateState = {
   selectedTemplate: null,
   templates: [],
   filteredTemplates: [],
-  selectedCategory: 'all',
+  selectedCategory: "all",
 };
 
 export const templateSlice = createSlice({
-  name: 'templates',
+  name: "templates",
   initialState,
   reducers: {
     setTemplates: (state, action: PayloadAction<Template[]>) => {
@@ -21,16 +21,17 @@ export const templateSlice = createSlice({
     },
     filterByCategory: (state, action: PayloadAction<string>) => {
       state.selectedCategory = action.payload;
-      if (action.payload === 'all') {
+      if (action.payload === "all") {
         state.filteredTemplates = state.templates;
       } else {
         state.filteredTemplates = state.templates.filter(
-          t => t.category === action.payload
+          (t) => t.category === action.payload,
         );
       }
     },
   },
 });
 
-export const { setTemplates, selectTemplate, filterByCategory } = templateSlice.actions;
+export const { setTemplates, selectTemplate, filterByCategory } =
+  templateSlice.actions;
 export default templateSlice.reducer;

@@ -5,14 +5,14 @@ import { CodePreview } from "./CodeFormat";
 import { Footer } from "../shared/Footer";
 
 const HeroWrapper: FC = () => {
-    return (
-       <div className="min-h-screen bg-background">
-          <Hero />
-          <Features />
-          <CodePreview />
-          <Footer />
-       </div>
-    )
-}
+  return (
+    <div className="min-h-screen bg-background">
+      <Hero />
+      <Features />
+      <CodePreview />
+      <Footer />
+    </div>
+  );
+};
 
-export default HeroWrapper
+export default HeroWrapper;

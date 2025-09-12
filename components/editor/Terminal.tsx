@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Terminal as TerminalIcon, 
-  Play, 
-  Trash2, 
+import {
+  Terminal as TerminalIcon,
+  Play,
+  Trash2,
   Download,
   Package,
-  Settings
+  Settings,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -20,7 +20,7 @@ interface Command {
   input: string;
   output: string;
   timestamp: Date;
-  status: 'success' | 'error' | 'running';
+  status: "success" | "error" | "running";
 }
 
 const commonCommands = [
@@ -33,11 +33,17 @@ const commonCommands = [
 ];
 
 const packages = [
-  { name: "react", description: "JavaScript library for building user interfaces" },
+  {
+    name: "react",
+    description: "JavaScript library for building user interfaces",
+  },
   { name: "lodash", description: "Utility library for JavaScript" },
   { name: "axios", description: "HTTP client for the browser and node.js" },
   { name: "moment", description: "Parse, validate, manipulate dates" },
-  { name: "express", description: "Fast, unopinionated, minimalist web framework" },
+  {
+    name: "express",
+    description: "Fast, unopinionated, minimalist web framework",
+  },
   { name: "typescript", description: "Typed superset of JavaScript" },
 ];
 
@@ -49,10 +55,12 @@ export function Terminal() {
       input: "Welcome to VibeCoding Terminal!",
       output: "Type commands below or click on common commands to get started.",
       timestamp: new Date(),
-      status: 'success'
-    }
+      status: "success",
+    },
   ]);
-  const [activeTab, setActiveTab] = useState<'terminal' | 'packages'>('terminal');
+  const [activeTab, setActiveTab] = useState<"terminal" | "packages">(
+    "terminal",
+  );
   const terminalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -67,48 +75,46 @@ export function Terminal() {
       input,
       output: "",
       timestamp: new Date(),
-      status: 'running'
+      status: "running",
     };
 
-    setCommands(prev => [...prev, newCommand]);
+    setCommands((prev) => [...prev, newCommand]);
 
     // Simulate command execution
     setTimeout(() => {
       let output = "";
-      let status: 'success' | 'error' = 'success';
+      let status: "success" | "error" = "success";
 
-      if (input.startsWith('npm install')) {
+      if (input.startsWith("npm install")) {
         output = `✓ Installing packages...\n✓ Package installed successfully!`;
         toast.success("Package installed!");
-      } else if (input.startsWith('npm run')) {
+      } else if (input.startsWith("npm run")) {
         output = `✓ Running script...\n✓ Script executed successfully!`;
         toast.success("Script executed!");
-      } else if (input.startsWith('git')) {
+      } else if (input.startsWith("git")) {
         output = `✓ Git command executed\n✓ Repository updated!`;
         toast.success("Git command executed!");
-      } else if (input === 'clear') {
+      } else if (input === "clear") {
         setCommands([]);
         return;
-      } else if (input === 'help') {
+      } else if (input === "help") {
         output = `Available commands:
 - npm install [package]  : Install npm package
 - npm run [script]       : Run npm script
 - git [command]          : Git operations
 - clear                  : Clear terminal
 - help                   : Show this help`;
-      } else if (input.trim() === '') {
+      } else if (input.trim() === "") {
         return;
       } else {
         output = `Command '${input}' not found. Type 'help' for available commands.`;
-        status = 'error';
+        status = "error";
       }
 
-      setCommands(prev =>
-        prev.map(cmd =>
-          cmd.id === newCommand.id
-            ? { ...cmd, output, status }
-            : cmd
-        )
+      setCommands((prev) =>
+        prev.map((cmd) =>
+          cmd.id === newCommand.id ? { ...cmd, output, status } : cmd,
+        ),
       );
     }, 1000);
 
@@ -116,7 +122,7 @@ export function Terminal() {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       executeCommand(currentInput);
     }
   };
@@ -135,18 +141,18 @@ export function Terminal() {
       {/* Tabs */}
       <div className="flex space-x-2">
         <Button
-          variant={activeTab === 'terminal' ? 'default' : 'ghost'}
+          variant={activeTab === "terminal" ? "default" : "ghost"}
           size="sm"
-          onClick={() => setActiveTab('terminal')}
+          onClick={() => setActiveTab("terminal")}
           className="flex items-center space-x-2"
         >
           <TerminalIcon className="w-4 h-4" />
           <span>Terminal</span>
         </Button>
         <Button
-          variant={activeTab === 'packages' ? 'default' : 'ghost'}
+          variant={activeTab === "packages" ? "default" : "ghost"}
           size="sm"
-          onClick={() => setActiveTab('packages')}
+          onClick={() => setActiveTab("packages")}
           className="flex items-center space-x-2"
         >
           <Package className="w-4 h-4" />
@@ -154,7 +160,7 @@ export function Terminal() {
         </Button>
       </div>
 
-      {activeTab === 'terminal' ? (
+      {activeTab === "terminal" ? (
         <Card className="glass">
           {/* Terminal Header */}
           <div className="p-4 border-b border-border flex items-center justify-between">
@@ -175,7 +181,7 @@ export function Terminal() {
           </div>
 
           {/* Terminal Output */}
-          <div 
+          <div
             ref={terminalRef}
             className="h-64 p-4 font-mono text-sm bg-background/50 overflow-y-auto"
           >
@@ -184,14 +190,18 @@ export function Terminal() {
                 <div className="flex items-center space-x-2 text-accent">
                   <span>$</span>
                   <span>{command.input}</span>
-                  {command.status === 'running' && (
+                  {command.status === "running" && (
                     <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
                   )}
                 </div>
                 {command.output && (
-                  <pre className={`mt-1 whitespace-pre-wrap ${
-                    command.status === 'error' ? 'text-destructive' : 'text-muted-foreground'
-                  }`}>
+                  <pre
+                    className={`mt-1 whitespace-pre-wrap ${
+                      command.status === "error"
+                        ? "text-destructive"
+                        : "text-muted-foreground"
+                    }`}
+                  >
                     {command.output}
                   </pre>
                 )}
@@ -210,10 +220,7 @@ export function Terminal() {
                 placeholder="Type a command..."
                 className="font-mono bg-transparent border-0 focus:ring-1 focus:ring-primary"
               />
-              <Button 
-                size="sm"
-                onClick={() => executeCommand(currentInput)}
-              >
+              <Button size="sm" onClick={() => executeCommand(currentInput)}>
                 <Play className="w-4 h-4" />
               </Button>
             </div>
@@ -221,7 +228,9 @@ export function Terminal() {
 
           {/* Common Commands */}
           <div className="p-4 border-t border-border">
-            <h4 className="text-sm font-medium mb-3 text-muted-foreground">Common Commands:</h4>
+            <h4 className="text-sm font-medium mb-3 text-muted-foreground">
+              Common Commands:
+            </h4>
             <div className="grid grid-cols-2 gap-2">
               {commonCommands.map((cmd) => (
                 <Button
@@ -252,12 +261,11 @@ export function Terminal() {
               >
                 <div>
                   <h4 className="font-medium">{pkg.name}</h4>
-                  <p className="text-sm text-muted-foreground">{pkg.description}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {pkg.description}
+                  </p>
                 </div>
-                <Button
-                  size="sm"
-                  onClick={() => installPackage(pkg.name)}
-                >
+                <Button size="sm" onClick={() => installPackage(pkg.name)}>
                   <Download className="w-4 h-4 mr-1" />
                   Install
                 </Button>

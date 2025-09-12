@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import Head from 'next/head';
-import { useSelector, useDispatch } from 'react-redux';
-import { filterByCategory, selectTemplate, setTemplates } from '@/redux/slices/templateSlices';
-import { AppDispatch, RootState } from '@/redux/store';
+import React, { useEffect } from "react";
+import dynamic from "next/dynamic";
+import Head from "next/head";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  filterByCategory,
+  selectTemplate,
+  setTemplates,
+} from "@/redux/slices/templateSlices";
+import { AppDispatch, RootState } from "@/redux/store";
 
 // Define template types
 interface Template {
@@ -23,23 +27,21 @@ interface TemplateSectionProps {
 }
 
 // Dynamically import Monaco Editor to avoid SSR issues
-const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
+const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center h-full bg-gray-900">
       <div className="text-white">Loading editor...</div>
     </div>
-  )
+  ),
 });
 
-const TemplateSection: React.FC<TemplateSectionProps> = ({ onTemplateSelect }) => {
+const TemplateSection: React.FC<TemplateSectionProps> = ({
+  onTemplateSelect,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
-  const {
-    templates,
-    filteredTemplates,
-    selectedTemplate,
-    selectedCategory
-  } = useSelector((state: RootState) => state.templates);
+  const { templates, filteredTemplates, selectedTemplate, selectedCategory } =
+    useSelector((state: RootState) => state.templates);
 
   const [categories, setCategories] = React.useState<string[]>([]);
 
@@ -48,10 +50,10 @@ const TemplateSection: React.FC<TemplateSectionProps> = ({ onTemplateSelect }) =
     const initialTemplates: Template[] = [
       // Frontend Templates
       {
-        id: 'react-component',
-        name: 'React Component',
-        description: 'Basic React component with TypeScript',
-        language: 'typescript',
+        id: "react-component",
+        name: "React Component",
+        description: "Basic React component with TypeScript",
+        language: "typescript",
         code: `import React from 'react';
 
 interface Props {
@@ -68,13 +70,13 @@ const MyComponent: React.FC<Props> = ({ name }) => {
 };
 
 export default MyComponent;`,
-        category: 'Frontend'
+        category: "Frontend",
       },
       {
-        id: 'react-hooks',
-        name: 'React Hooks',
-        description: 'React component with useState and useEffect hooks',
-        language: 'typescript',
+        id: "react-hooks",
+        name: "React Hooks",
+        description: "React component with useState and useEffect hooks",
+        language: "typescript",
         code: `import React, { useState, useEffect } from 'react';
 
 interface User {
@@ -118,13 +120,13 @@ const UserProfile: React.FC = () => {
 };
 
 export default UserProfile;`,
-        category: 'Frontend'
+        category: "Frontend",
       },
       {
-        id: 'vue-composition',
-        name: 'Vue Composition API',
-        description: 'Vue 3 component with Composition API',
-        language: 'javascript',
+        id: "vue-composition",
+        name: "Vue Composition API",
+        description: "Vue 3 component with Composition API",
+        language: "javascript",
         code: `<template>
   <div class="counter">
     <h2>Counter: {{ count }}</h2>
@@ -177,13 +179,13 @@ button:hover {
   background: #2980b9;
 }
 </style>`,
-        category: 'Frontend'
+        category: "Frontend",
       },
       {
-        id: 'angular-component',
-        name: 'Angular Component',
-        description: 'Basic Angular component with TypeScript',
-        language: 'typescript',
+        id: "angular-component",
+        name: "Angular Component",
+        description: "Basic Angular component with TypeScript",
+        language: "typescript",
         code: `import { Component, OnInit } from '@angular/core';
 
 interface Product {
@@ -230,13 +232,13 @@ export class ProductListComponent implements OnInit {
     // Implement cart logic here
   }
 }`,
-        category: 'Frontend'
+        category: "Frontend",
       },
       {
-        id: 'svelte-component',
-        name: 'Svelte Component',
-        description: 'Svelte component with reactive state',
-        language: 'javascript',
+        id: "svelte-component",
+        name: "Svelte Component",
+        description: "Svelte component with reactive state",
+        language: "javascript",
         code: `<script>
   let count = 0;
   let name = 'World';
@@ -306,15 +308,15 @@ export class ProductListComponent implements OnInit {
     border-radius: 4px;
   }
 </style>`,
-        category: 'Frontend'
+        category: "Frontend",
       },
 
       // Backend Templates
       {
-        id: 'express-api',
-        name: 'Express API',
-        description: 'Node.js Express server with TypeScript',
-        language: 'typescript',
+        id: "express-api",
+        name: "Express API",
+        description: "Node.js Express server with TypeScript",
+        language: "typescript",
         code: `import express, { Application, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -380,13 +382,13 @@ app.use((req: Request, res: Response) => {
 app.listen(port, () => {
   console.log(\`Server is running on port \${port}\`);
 });`,
-        category: 'Backend'
+        category: "Backend",
       },
       {
-        id: 'fastapi-crud',
-        name: 'FastAPI CRUD',
-        description: 'FastAPI with full CRUD operations',
-        language: 'python',
+        id: "fastapi-crud",
+        name: "FastAPI CRUD",
+        description: "FastAPI with full CRUD operations",
+        language: "python",
         code: `from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
 from typing import List, Optional
@@ -468,13 +470,13 @@ async def delete_todo(todo_id: str):
             return
     
     raise HTTPException(status_code=404, detail="Todo not found")`,
-        category: 'Backend'
+        category: "Backend",
       },
       {
-        id: 'nestjs-controller',
-        name: 'NestJS Controller',
-        description: 'NestJS controller with TypeORM',
-        language: 'typescript',
+        id: "nestjs-controller",
+        name: "NestJS Controller",
+        description: "NestJS controller with TypeORM",
+        language: "typescript",
         code: `import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -550,13 +552,13 @@ export class UsersController {
     return user;
   }
 }`,
-        category: 'Backend'
+        category: "Backend",
       },
       {
-        id: 'django-view',
-        name: 'Django View',
-        description: 'Django REST framework view',
-        language: 'python',
+        id: "django-view",
+        name: "Django View",
+        description: "Django REST framework view",
+        language: "python",
         code: `from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -637,13 +639,13 @@ def product_bulk_create(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)`,
-        category: 'Backend'
+        category: "Backend",
       },
       {
-        id: 'spring-boot',
-        name: 'Spring Boot',
-        description: 'Spring Boot REST controller',
-        language: 'java',
+        id: "spring-boot",
+        name: "Spring Boot",
+        description: "Spring Boot REST controller",
+        language: "java",
         code: `package com.example.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -724,13 +726,13 @@ public class UserController {
                   .orElse(ResponseEntity.notFound().build());
     }
 }`,
-        category: 'Backend'
+        category: "Backend",
       },
       {
-        id: 'graphql-apollo',
-        name: 'GraphQL Apollo',
-        description: 'GraphQL server with Apollo and TypeScript',
-        language: 'typescript',
+        id: "graphql-apollo",
+        name: "GraphQL Apollo",
+        description: "GraphQL server with Apollo and TypeScript",
+        language: "typescript",
         code: `import { ApolloServer } from 'apollo-server';
 import { gql } from 'apollo-server-core';
 
@@ -847,16 +849,19 @@ const server = new ApolloServer({
 server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
   console.log(\`🚀 Server ready at \${url}\`);
 });`,
-        category: 'Backend'
-      }
+        category: "Backend",
+      },
     ];
 
     dispatch(setTemplates(initialTemplates));
-    
+
     // Extract unique categories
-    const uniqueCategories = ['all', ...new Set(initialTemplates.map(t => t.category))];
+    const uniqueCategories = [
+      "all",
+      ...new Set(initialTemplates.map((t) => t.category)),
+    ];
     setCategories(uniqueCategories as string[]);
-    
+
     // Set the first template as selected by default
     if (initialTemplates.length > 0 && !selectedTemplate) {
       dispatch(selectTemplate(initialTemplates[0]));
@@ -879,7 +884,10 @@ server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
     <div className="min-h-screen text-white">
       <Head>
         <title>Template Section with Monaco Editor</title>
-        <meta name="description" content="Template selection with Monaco editor" />
+        <meta
+          name="description"
+          content="Template selection with Monaco editor"
+        />
       </Head>
 
       <div className="container mx-auto px-4 py-8">
@@ -887,7 +895,9 @@ server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
           <h1 className="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
             Code Templates
           </h1>
-          <p className="text-gray-400">Select a template to view and edit in the Monaco editor</p>
+          <p className="text-gray-400">
+            Select a template to view and edit in the Monaco editor
+          </p>
         </header>
 
         <div className="flex flex-col lg:flex-row gap-6">
@@ -896,18 +906,18 @@ server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
             <div className="p-4 bg-gray-700">
               <h2 className="text-xl font-semibold">Templates</h2>
             </div>
-            
+
             {/* Category filter */}
             <div className="p-4 bg-gray-750">
               <div className="flex flex-wrap gap-2">
-                {categories.map(category => (
+                {categories.map((category) => (
                   <button
                     key={category}
                     onClick={() => handleCategoryFilter(category)}
                     className={`px-3 py-1 rounded-full text-sm ${
                       selectedCategory === category
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                     }`}
                   >
                     {category}
@@ -915,23 +925,27 @@ server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
                 ))}
               </div>
             </div>
-            
+
             {/* Template list */}
             <div className="overflow-y-auto max-h-96">
-              {filteredTemplates.map(template => (
+              {filteredTemplates.map((template) => (
                 <div
                   key={template.id}
                   onClick={() => handleSelectTemplate(template)}
                   className={`p-4 border-b border-gray-700 cursor-pointer transition-colors ${
                     selectedTemplate?.id === template.id
-                      ? 'bg-blue-900 bg-opacity-30'
-                      : 'hover:bg-gray-700'
+                      ? "bg-blue-900 bg-opacity-30"
+                      : "hover:bg-gray-700"
                   }`}
                 >
                   <h3 className="font-medium text-lg">{template.name}</h3>
-                  <p className="text-gray-400 text-sm mt-1">{template.description}</p>
+                  <p className="text-gray-400 text-sm mt-1">
+                    {template.description}
+                  </p>
                   <div className="flex justify-between items-center mt-2">
-                    <span className="text-xs text-gray-500">{template.category}</span>
+                    <span className="text-xs text-gray-500">
+                      {template.category}
+                    </span>
                     <span className="text-xs px-2 py-1 bg-gray-700 rounded">
                       {template.language}
                     </span>
@@ -945,13 +959,13 @@ server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
           <div className="w-full lg:w-2/3 bg-gray-800 rounded-lg shadow-lg overflow-hidden">
             <div className="p-4 bg-gray-700 flex justify-between items-center">
               <h2 className="text-xl font-semibold">
-                {selectedTemplate?.name || 'Select a template'}
+                {selectedTemplate?.name || "Select a template"}
               </h2>
               <div className="text-sm text-gray-400">
                 {selectedTemplate?.language.toUpperCase()}
               </div>
             </div>
-            
+
             <div className="h-96 md:h-[500px]">
               {selectedTemplate ? (
                 <MonacoEditor
@@ -963,18 +977,20 @@ server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
                     minimap: { enabled: false },
                     scrollBeyondLastLine: false,
                     fontSize: 14,
-                    wordWrap: 'on',
+                    wordWrap: "on",
                     automaticLayout: true,
-                    padding: { top: 10 }
+                    padding: { top: 10 },
                   }}
                 />
               ) : (
                 <div className="flex items-center justify-center h-full bg-gray-900">
-                  <p className="text-gray-500">Select a template to start editing</p>
+                  <p className="text-gray-500">
+                    Select a template to start editing
+                  </p>
                 </div>
               )}
             </div>
-            
+
             <div className="p-4 bg-gray-750 flex justify-between items-center">
               <div className="text-sm text-gray-400">
                 {selectedTemplate?.category} • {selectedTemplate?.language}
